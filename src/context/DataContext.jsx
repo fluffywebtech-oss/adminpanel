@@ -260,80 +260,87 @@ export function DataProvider({ children }) {
   // ==========================================================================
   const addProperty = useCallback(async (property) => {
     if (supabase) {
-      // Normalize status for DB: internal "sale"/"rent" → DB "For Sale"/"For Rent"
-      const dbStatus = property.status === 'sale' ? 'For Sale'
-        : property.status === 'rent' ? 'For Rent'
-        : property.status;
-      const { data, error } = await supabase.from('properties').insert({
-        title: property.title,
-        location: property.location,
-        price: property.price,
-        beds: property.beds,
-        baths: property.baths,
-        sqft: property.sqft,
-        type: property.type,
-        status: dbStatus,
-        builder: property.builder,
-        rera_id: property.reraId,
-        possession_status: property.possessionStatus,
-        floor: property.floor,
-        furnishing: property.furnishing,
-        emi_estimate: property.emiEstimate,
-        bank_offers: property.bankOffers,
-        images: property.images || [],
-        amenities: property.amenities || [],
-        featured: property.featured,
-        hot: property.hot,
-        open_house: property.openHouse,
-        facing: property.facing,
-        parking: property.parking,
-        price_per_sqft: property.pricePerSqft,
-        verified: property.verified,
-        views: property.views || 0,
-        description: property.description,
-        agent_id: property.agent?.id,
-        agent_name: property.agent?.name,
-        agent_avatar: property.agent?.avatar,
-        agent_rating: property.agent?.rating,
-        agent_sales: property.agent?.sales,
-        agent_phone: property.agent?.phone,
-        agent_email: property.agent?.email,
-        post_date: property.postDate,
-        lat: property.lat,
-        lng: property.lng,
-        neighborhood: property.neighborhood,
-        floor_plan: property.floorPlan,
-      }).select().single();
-      if (error) throw error;
-      return data;
-    } else {
-      // Fallback: local state update
-      const newId = Math.max(...properties.map(p => typeof p.id === 'number' ? p.id : 0), 0) + 1;
-      const newProp = { ...property, id: newId };
-      setProperties(prev => [newProp, ...prev]);
-      return newProp;
+      try {
+        // Normalize status for DB: internal "sale"/"rent" → DB "For Sale"/"For Rent"
+        const dbStatus = property.status === 'sale' ? 'For Sale'
+          : property.status === 'rent' ? 'For Rent'
+          : property.status;
+        const { data, error } = await supabase.from('properties').insert({
+          title: property.title,
+          location: property.location,
+          price: property.price,
+          beds: property.beds,
+          baths: property.baths,
+          sqft: property.sqft,
+          type: property.type,
+          status: dbStatus,
+          builder: property.builder,
+          rera_id: property.reraId,
+          possession_status: property.possessionStatus,
+          floor: property.floor,
+          furnishing: property.furnishing,
+          emi_estimate: property.emiEstimate,
+          bank_offers: property.bankOffers,
+          images: property.images || [],
+          amenities: property.amenities || [],
+          featured: property.featured,
+          hot: property.hot,
+          open_house: property.openHouse,
+          facing: property.facing,
+          parking: property.parking,
+          price_per_sqft: property.pricePerSqft,
+          verified: property.verified,
+          views: property.views || 0,
+          description: property.description,
+          agent_id: property.agent?.id,
+          agent_name: property.agent?.name,
+          agent_avatar: property.agent?.avatar,
+          agent_rating: property.agent?.rating,
+          agent_sales: property.agent?.sales,
+          agent_phone: property.agent?.phone,
+          agent_email: property.agent?.email,
+          post_date: property.postDate,
+          lat: property.lat,
+          lng: property.lng,
+          neighborhood: property.neighborhood,
+          floor_plan: property.floorPlan,
+        }).select().single();
+        if (error) throw error;
+        return data;
+      } catch (supabaseErr) {
+        console.warn('Supabase addProperty failed, using local fallback:', supabaseErr);
+      }
     }
+    // Fallback: local state update (no Supabase OR Supabase failed)
+    const newId = Math.max(...properties.map(p => typeof p.id === 'number' ? p.id : 0), 0) + 1;
+    const newProp = { ...property, id: newId };
+    setProperties(prev => [newProp, ...prev]);
+    return newProp;
   }, [properties, supabase]); // eslint-disable-line
 
   const updateProperty = useCallback(async (id, updates) => {
     if (supabase) {
-      // Convert camelCase updates to snake_case for Supabase columns,
-      // and normalize status values for DB storage format
-      const dbUpdates = {};
-      const fieldMap = {
-        reraId: 'rera_id', possessionStatus: 'possession_status', pricePerSqft: 'price_per_sqft',
-        floorPlan: 'floor_plan', openHouse: 'open_house', bankOffers: 'bank_offers',
-        emiEstimate: 'emi_estimate', postDate: 'post_date',
-      };
-      for (const [key, value] of Object.entries(updates)) {
-        const dbKey = fieldMap[key] || key;
-        // Normalize: internal "sale"/"rent" → DB "For Sale"/"For Rent"
-        if (dbKey === 'status' && value === 'sale') dbUpdates[dbKey] = 'For Sale';
-        else if (dbKey === 'status' && value === 'rent') dbUpdates[dbKey] = 'For Rent';
-        else dbUpdates[dbKey] = value;
+      try {
+        // Convert camelCase updates to snake_case for Supabase columns,
+        // and normalize status values for DB storage format
+        const dbUpdates = {};
+        const fieldMap = {
+          reraId: 'rera_id', possessionStatus: 'possession_status', pricePerSqft: 'price_per_sqft',
+          floorPlan: 'floor_plan', openHouse: 'open_house', bankOffers: 'bank_offers',
+          emiEstimate: 'emi_estimate', postDate: 'post_date',
+        };
+        for (const [key, value] of Object.entries(updates)) {
+          const dbKey = fieldMap[key] || key;
+          // Normalize: internal "sale"/"rent" → DB "For Sale"/"For Rent"
+          if (dbKey === 'status' && value === 'sale') dbUpdates[dbKey] = 'For Sale';
+          else if (dbKey === 'status' && value === 'rent') dbUpdates[dbKey] = 'For Rent';
+          else dbUpdates[dbKey] = value;
+        }
+        const { error } = await supabase.from('properties').update(dbUpdates).eq('id', id);
+        if (error) throw error;
+      } catch (supabaseErr) {
+        console.warn('Supabase updateProperty failed, updating local state only:', supabaseErr);
       }
-      const { error } = await supabase.from('properties').update(dbUpdates).eq('id', id);
-      if (error) throw error;
     }
     // Always update local state immediately for responsiveness
     setProperties(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
@@ -341,8 +348,12 @@ export function DataProvider({ children }) {
 
   const deleteProperty = useCallback(async (id) => {
     if (supabase) {
-      const { error } = await supabase.from('properties').delete().eq('id', id);
-      if (error) throw error;
+      try {
+        const { error } = await supabase.from('properties').delete().eq('id', id);
+        if (error) throw error;
+      } catch (supabaseErr) {
+        console.warn('Supabase deleteProperty failed, removing from local state only:', supabaseErr);
+      }
     }
     setProperties(prev => prev.filter(p => p.id !== id));
   }, [supabase]);
@@ -352,61 +363,73 @@ export function DataProvider({ children }) {
   // ==========================================================================
   const addReel = useCallback(async (reel) => {
     if (supabase) {
-      const { data, error } = await supabase.from('reels').insert({
-        property_id: reel.propertyId,
-        title: reel.title,
-        location: reel.location,
-        price: reel.price,
-        category: reel.category,
-        video: reel.video,
-        thumbnail: reel.thumbnail,
-        description: reel.description,
-        views: reel.views || 0,
-        likes: reel.likes || 0,
-        status: reel.status,
-        duration: reel.duration,
-        tags: reel.tags,
-        agent_name: reel.agentName,
-        builder: reel.builder,
-        rera_id: reel.reraId,
-        possession_date: reel.possessionDate,
-        sqft: reel.sqft,
-        furnishing: reel.furnishing,
-        floor: reel.floor,
-        emi_estimate: reel.emiEstimate,
-        bank_offers: reel.bankOffers,
-      }).select().single();
-      if (error) throw error;
-      return data;
-    } else {
-      const newId = Math.max(...reels.map(r => typeof r.id === 'number' ? r.id : 0), 100) + 1;
-      const newReel = { ...reel, id: newId };
-      setReels(prev => [newReel, ...prev]);
-      return newReel;
+      try {
+        const { data, error } = await supabase.from('reels').insert({
+          property_id: reel.propertyId,
+          title: reel.title,
+          location: reel.location,
+          price: reel.price,
+          category: reel.category,
+          video: reel.video,
+          thumbnail: reel.thumbnail,
+          description: reel.description,
+          views: reel.views || 0,
+          likes: reel.likes || 0,
+          status: reel.status,
+          duration: reel.duration,
+          tags: reel.tags,
+          agent_name: reel.agentName,
+          builder: reel.builder,
+          rera_id: reel.reraId,
+          possession_date: reel.possessionDate,
+          sqft: reel.sqft,
+          furnishing: reel.furnishing,
+          floor: reel.floor,
+          emi_estimate: reel.emiEstimate,
+          bank_offers: reel.bankOffers,
+        }).select().single();
+        if (error) throw error;
+        return data;
+      } catch (supabaseErr) {
+        console.warn('Supabase addReel failed, using local fallback:', supabaseErr);
+      }
     }
+    // Fallback: local state update (no Supabase OR Supabase failed)
+    const newId = Math.max(...reels.map(r => typeof r.id === 'number' ? r.id : 0), 100) + 1;
+    const newReel = { ...reel, id: newId };
+    setReels(prev => [newReel, ...prev]);
+    return newReel;
   }, [reels, supabase]); // eslint-disable-line
 
   const updateReel = useCallback(async (id, updates) => {
     if (supabase) {
-      // Convert camelCase updates to snake_case for Supabase columns
-      const dbUpdates = {};
-      const fieldMap = {
-        propertyId: 'property_id', agentName: 'agent_name', reraId: 'rera_id',
-        possessionDate: 'possession_date', emiEstimate: 'emi_estimate', bankOffers: 'bank_offers',
-      };
-      for (const [key, value] of Object.entries(updates)) {
-        dbUpdates[fieldMap[key] || key] = value;
+      try {
+        // Convert camelCase updates to snake_case for Supabase columns
+        const dbUpdates = {};
+        const fieldMap = {
+          propertyId: 'property_id', agentName: 'agent_name', reraId: 'rera_id',
+          possessionDate: 'possession_date', emiEstimate: 'emi_estimate', bankOffers: 'bank_offers',
+        };
+        for (const [key, value] of Object.entries(updates)) {
+          dbUpdates[fieldMap[key] || key] = value;
+        }
+        const { error } = await supabase.from('reels').update(dbUpdates).eq('id', id);
+        if (error) throw error;
+      } catch (supabaseErr) {
+        console.warn('Supabase updateReel failed, updating local state only:', supabaseErr);
       }
-      const { error } = await supabase.from('reels').update(dbUpdates).eq('id', id);
-      if (error) throw error;
     }
     setReels(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
   }, [supabase]);
 
   const deleteReel = useCallback(async (id) => {
     if (supabase) {
-      const { error } = await supabase.from('reels').delete().eq('id', id);
-      if (error) throw error;
+      try {
+        const { error } = await supabase.from('reels').delete().eq('id', id);
+        if (error) throw error;
+      } catch (supabaseErr) {
+        console.warn('Supabase deleteReel failed, removing from local state only:', supabaseErr);
+      }
     }
     setReels(prev => prev.filter(r => r.id !== id));
   }, [supabase]);
