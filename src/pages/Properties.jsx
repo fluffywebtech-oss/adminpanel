@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Search, Plus, Edit2, Trash2, Eye, X, MapPin, Bed, Bath, Square, Home, AlertTriangle, Star, Flame, Shield, Calendar, Car, Compass, Camera, Trees, Sparkles, Image, Upload, Phone, Mail, Globe, Building2 } from 'lucide-react'
+import { Search, Plus, Edit2, Trash2, Eye, X, MapPin, Bed, Bath, Square, Home, AlertTriangle, Star, Flame, Shield, Calendar, Car, Compass, Camera, Trees, Sparkles, Image, Upload, Phone, Mail, Globe, Building2, Loader2 } from 'lucide-react'
 import { useData } from '../context/DataContext'
+import { uploadImage } from '../lib/uploadImage'
 
 const ITEMS_PER_PAGE = 8
 
@@ -28,6 +29,7 @@ export default function Properties() {
     agentPhone:'', agentEmail:'', developerLogo:'', developerWebsite:'',
   })
   const [imageUrlInput, setImageUrlInput] = useState('')
+  const [uploading, setUploading] = useState(false)
 
   const filtered = properties.filter(p => {
     if (search && !p.title.toLowerCase().includes(search.toLowerCase()) && !p.location.toLowerCase().includes(search.toLowerCase()) && !p.builder.toLowerCase().includes(search.toLowerCase())) return false
@@ -372,23 +374,28 @@ export default function Properties() {
                     placeholder="Paste image URL..."
                   />
                   <button onClick={addImageUrl} className="btn-primary flex items-center gap-1"><Plus className="w-4 h-4" />Add URL</button>
-                  <label className="btn-secondary flex items-center gap-1 cursor-pointer">
-                    <Upload className="w-4 h-4" />Upload from PC
+                  <label className={`btn-secondary flex items-center gap-1 ${uploading ? 'opacity-60 cursor-wait' : 'cursor-pointer'}`}>
+                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    {uploading ? 'Uploading…' : 'Upload from PC'}
                     <input
                       type="file"
                       accept="image/*"
                       multiple
+                      disabled={uploading}
                       className="hidden"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const files = Array.from(e.target.files || [])
-                        files.forEach(file => {
-                          const reader = new FileReader()
-                          reader.onload = () => {
-                            setForm(f => ({ ...f, images: [...f.images, reader.result] }))
-                          }
-                          reader.readAsDataURL(file)
-                        })
                         e.target.value = ''
+                        if (!files.length) return
+                        setUploading(true)
+                        try {
+                          for (const file of files) {
+                            const url = await uploadImage(file)
+                            setForm(f => ({ ...f, images: [...f.images, url] }))
+                          }
+                        } finally {
+                          setUploading(false)
+                        }
                       }}
                     />
                   </label>
@@ -406,6 +413,7 @@ export default function Properties() {
                 ) : (
                   <p className="text-sm text-gray-400 py-3 border-2 border-dashed border-gray-200 rounded-lg text-center">No images added. Paste URLs or upload from your computer.</p>
                 )}
+                <p className="text-xs text-gray-400 mt-2">📦 Uploads are stored in your Supabase Storage bucket <code>property-images</code> and saved as public URLs — they appear instantly across the app.</p>
               </div>
 
               {/* Enriched Fields */}
