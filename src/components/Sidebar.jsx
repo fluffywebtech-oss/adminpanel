@@ -21,6 +21,7 @@ import {
   Key,
   Inbox,
   Mic,
+  Video,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -36,6 +37,7 @@ const navSections = [
       { path: '/stories', label: 'Stories', icon: PlayCircle },
       { path: '/blogs', label: 'Blog Posts', icon: FileText },
       { path: '/podcasts', label: 'Podcasts', icon: Mic },
+      { path: '/videos', label: 'Product Videos', icon: Video },
       { path: '/agents', label: 'Agents', icon: Users },
     ],
   },

@@ -19,6 +19,7 @@ import SocietyOS from './pages/SocietyOS'
 import PropertyManagement from './pages/PropertyManagement'
 import Enquiries from './pages/Enquiries'
 import Podcasts from './pages/Podcasts'
+import Videos from './pages/Videos'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -72,6 +73,7 @@ export default function App() {
         <Route path="stories" element={<Stories />} />
         <Route path="blogs" element={<Blogs />} />
         <Route path="podcasts" element={<Podcasts />} />
+        <Route path="videos" element={<Videos />} />
         <Route path="agents" element={<Agents />} />
         <Route path="site-config" element={<SiteConfig />} />
         <Route path="notifications" element={<Notifications />} />

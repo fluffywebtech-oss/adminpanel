@@ -6,6 +6,7 @@ import {
   propertyStories as staticStories,
   blogPosts as staticBlogs,
   podcasts as staticPodcasts,
+  productVideos as staticVideos,
   agentsData as staticAgents,
   propertyReviews as staticReviews,
   quizQuestions as staticQuiz,
@@ -136,6 +137,7 @@ export function DataProvider({ children }) {
   const [stories, setStories] = useState(staticStories);
   const [blogs, setBlogs] = useState(staticBlogs);
   const [podcasts, setPodcasts] = useState(staticPodcasts);
+  const [videos, setVideos] = useState(staticVideos);
   const [agents, setAgents] = useState(staticAgents);
   const [reviews, setReviews] = useState(() => {
     const initial = {};
@@ -609,6 +611,19 @@ export function DataProvider({ children }) {
     setPodcasts(prev => prev.filter(p => p.id !== id));
   }, []);
 
+  const addVideo = useCallback((video) => {
+    const newId = Math.max(...videos.map(v => v.id), 0) + 1;
+    setVideos(prev => [...prev, { id: newId, ...video }]);
+  }, [videos]);
+
+  const updateVideo = useCallback((id, updates) => {
+    setVideos(prev => prev.map(v => v.id === id ? { ...v, ...updates } : v));
+  }, []);
+
+  const deleteVideo = useCallback((id) => {
+    setVideos(prev => prev.filter(v => v.id !== id));
+  }, []);
+
   // ==========================================================================
   // CRUD: Reviews (local only)
   // ==========================================================================
@@ -664,7 +679,7 @@ export function DataProvider({ children }) {
   // ==========================================================================
   const value = {
     // Data
-    properties, reels, stories, blogs, podcasts, agents, reviews, quiz,
+    properties, reels, stories, blogs, podcasts, videos, agents, reviews, quiz,
     // Dashboard
     dashboardStats, dashRevenueData: revenueData,
     dashPropertyTypeData: propertyTypeData,
@@ -686,6 +701,8 @@ export function DataProvider({ children }) {
     addBlog, updateBlog, deleteBlog,
     // Podcast CRUD
     addPodcast, updatePodcast, deletePodcast,
+    // Video CRUD
+    addVideo, updateVideo, deleteVideo,
     // Review CRUD
     addReview, updateReview, deleteReview,
     // Quiz CRUD
