@@ -22,6 +22,8 @@ import {
   Inbox,
   Mic,
   Video,
+  Handshake,
+  TrendingUp,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -44,6 +46,8 @@ const navSections = [
   {
     label: 'Operations & Management',
     items: [
+      { path: '/transactions', label: 'Transactions', icon: Handshake },
+      { path: '/investments', label: 'Investments', icon: TrendingUp },
       { path: '/builder-erp', label: 'Builder ERP', icon: Building2 },
       { path: '/channel-partners', label: 'Channel Partners', icon: Network },
       { path: '/society-os', label: 'Society OS', icon: Shield },

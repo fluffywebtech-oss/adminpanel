@@ -20,6 +20,8 @@ import PropertyManagement from './pages/PropertyManagement'
 import Enquiries from './pages/Enquiries'
 import Podcasts from './pages/Podcasts'
 import Videos from './pages/Videos'
+import Transactions from './pages/Transactions'
+import Investments from './pages/Investments'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -84,6 +86,8 @@ export default function App() {
         <Route path="channel-partners" element={<ChannelPartners />} />
         <Route path="society-os" element={<SocietyOS />} />
         <Route path="property-management" element={<PropertyManagement />} />
+        <Route path="transactions" element={<Transactions />} />
+        <Route path="investments" element={<Investments />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
