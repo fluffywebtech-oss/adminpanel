@@ -17,6 +17,7 @@ import BuilderERP from './pages/BuilderERP'
 import ChannelPartners from './pages/ChannelPartners'
 import SocietyOS from './pages/SocietyOS'
 import PropertyManagement from './pages/PropertyManagement'
+import Enquiries from './pages/Enquiries'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -64,6 +65,7 @@ export default function App() {
         <ProtectedRoute><Layout /></ProtectedRoute>
       }>
         <Route index element={<Dashboard />} />
+        <Route path="enquiries" element={<Enquiries />} />
         <Route path="properties" element={<Properties />} />
         <Route path="reels" element={<Reels />} />
         <Route path="stories" element={<Stories />} />

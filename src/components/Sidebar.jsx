@@ -19,6 +19,7 @@ import {
   Network,
   Shield,
   Key,
+  Inbox,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -28,6 +29,7 @@ const navSections = [
     label: 'Content',
     items: [
       { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/enquiries', label: 'Enquiries', icon: Inbox },
       { path: '/properties', label: 'Properties', icon: Home },
       { path: '/reels', label: 'Property Reels', icon: Film },
       { path: '/stories', label: 'Stories', icon: PlayCircle },
