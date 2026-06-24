@@ -5,6 +5,7 @@ import {
   allReels as staticReels,
   propertyStories as staticStories,
   blogPosts as staticBlogs,
+  podcasts as staticPodcasts,
   agentsData as staticAgents,
   propertyReviews as staticReviews,
   quizQuestions as staticQuiz,
@@ -134,6 +135,7 @@ export function DataProvider({ children }) {
   const [reels, setReels] = useState(staticReels);
   const [stories, setStories] = useState(staticStories);
   const [blogs, setBlogs] = useState(staticBlogs);
+  const [podcasts, setPodcasts] = useState(staticPodcasts);
   const [agents, setAgents] = useState(staticAgents);
   const [reviews, setReviews] = useState(() => {
     const initial = {};
@@ -594,6 +596,19 @@ export function DataProvider({ children }) {
     setBlogs(prev => prev.filter(b => b.id !== id));
   }, []);
 
+  const addPodcast = useCallback((podcast) => {
+    const newId = Math.max(...podcasts.map(p => p.id), 0) + 1;
+    setPodcasts(prev => [...prev, { id: newId, ...podcast }]);
+  }, [podcasts]);
+
+  const updatePodcast = useCallback((id, updates) => {
+    setPodcasts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+  }, []);
+
+  const deletePodcast = useCallback((id) => {
+    setPodcasts(prev => prev.filter(p => p.id !== id));
+  }, []);
+
   // ==========================================================================
   // CRUD: Reviews (local only)
   // ==========================================================================
@@ -649,7 +664,7 @@ export function DataProvider({ children }) {
   // ==========================================================================
   const value = {
     // Data
-    properties, reels, stories, blogs, agents, reviews, quiz,
+    properties, reels, stories, blogs, podcasts, agents, reviews, quiz,
     // Dashboard
     dashboardStats, dashRevenueData: revenueData,
     dashPropertyTypeData: propertyTypeData,
@@ -669,6 +684,8 @@ export function DataProvider({ children }) {
     addStory, updateStory, deleteStory,
     // Blog CRUD
     addBlog, updateBlog, deleteBlog,
+    // Podcast CRUD
+    addPodcast, updatePodcast, deletePodcast,
     // Review CRUD
     addReview, updateReview, deleteReview,
     // Quiz CRUD

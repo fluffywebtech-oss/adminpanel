@@ -18,6 +18,7 @@ import ChannelPartners from './pages/ChannelPartners'
 import SocietyOS from './pages/SocietyOS'
 import PropertyManagement from './pages/PropertyManagement'
 import Enquiries from './pages/Enquiries'
+import Podcasts from './pages/Podcasts'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -70,6 +71,7 @@ export default function App() {
         <Route path="reels" element={<Reels />} />
         <Route path="stories" element={<Stories />} />
         <Route path="blogs" element={<Blogs />} />
+        <Route path="podcasts" element={<Podcasts />} />
         <Route path="agents" element={<Agents />} />
         <Route path="site-config" element={<SiteConfig />} />
         <Route path="notifications" element={<Notifications />} />
