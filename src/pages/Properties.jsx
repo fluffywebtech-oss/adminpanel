@@ -4,6 +4,8 @@ import { useData } from '../context/DataContext'
 import { uploadImage } from '../lib/uploadImage'
 import BulkImport from '../components/BulkImport'
 import AiListing from '../components/AiListing'
+import SocialStudio from '../components/SocialStudio'
+import { Megaphone } from 'lucide-react'
 
 const ITEMS_PER_PAGE = 8
 
@@ -22,6 +24,7 @@ export default function Properties() {
   const [showModal, setShowModal] = useState(false)
   const [showBulk, setShowBulk] = useState(false)
   const [showAi, setShowAi] = useState(false)
+  const [showSocial, setShowSocial] = useState(null)
   const [showDelete, setShowDelete] = useState(null)
   const [showView, setShowView] = useState(null)
   const [editing, setEditing] = useState(null)
@@ -254,9 +257,10 @@ export default function Properties() {
                   <td className="table-cell text-sm text-gray-500">{(p.views/1000).toFixed(1)}K</td>
                   <td className="table-cell">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setShowView(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500"><Eye className="w-4 h-4" /></button>
-                      <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-blue-500"><Edit2 className="w-4 h-4" /></button>
-                      <button onClick={() => setShowDelete(p.id)} className="p-1.5 rounded-md hover:bg-gray-100 text-red-500"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => setShowView(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500" title="Preview"><Eye className="w-4 h-4" /></button>
+                      <button onClick={() => setShowSocial(p)} className="p-1.5 rounded-md hover:bg-violet-50 text-violet-600" title="AI Social Post"><Megaphone className="w-4 h-4" /></button>
+                      <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-blue-500" title="Edit"><Edit2 className="w-4 h-4" /></button>
+                      <button onClick={() => setShowDelete(p.id)} className="p-1.5 rounded-md hover:bg-gray-100 text-red-500" title="Delete"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
@@ -660,6 +664,7 @@ export default function Properties() {
 
       {showBulk && <BulkImport onClose={() => setShowBulk(false)} />}
       {showAi && <AiListing onClose={() => setShowAi(false)} />}
+      {showSocial && <SocialStudio property={showSocial} onClose={() => setShowSocial(null)} />}
     </div>
   )
 }
