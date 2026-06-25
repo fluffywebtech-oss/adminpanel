@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X, Upload, FileText, Braces, Download, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { logAudit } from '../lib/audit'
 
 // Map a normalized property to the EXACT `properties` table columns (snake_case).
 // Deliberately omits developer_logo/developer_website which don't exist on the table.
@@ -167,6 +168,7 @@ export default function BulkImport({ onClose, toast }) {
     }
     setImporting(false)
     setResult({ added, failed })
+    if (added) logAudit('Imported listings', `${added} ${added === 1 ? 'property' : 'properties'} via ${mode.toUpperCase()}`)
     toast?.(`Imported ${added} listing${added === 1 ? '' : 's'}${failed ? `, ${failed} failed` : ''}`, failed ? 'warning' : 'success')
   }
 

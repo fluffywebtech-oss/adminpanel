@@ -20,6 +20,7 @@ import PropertyManagement from './pages/PropertyManagement'
 import Enquiries from './pages/Enquiries'
 import Assistant from './pages/Assistant'
 import Meetings from './pages/Meetings'
+import Team from './pages/Team'
 import Podcasts from './pages/Podcasts'
 import Videos from './pages/Videos'
 import Transactions from './pages/Transactions'
@@ -86,6 +87,7 @@ export default function App() {
         <Route path="reviews" element={<Reviews />} />
         <Route path="quiz" element={<Quiz />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="team" element={<Team />} />
         <Route path="builder-erp" element={<BuilderERP />} />
         <Route path="channel-partners" element={<ChannelPartners />} />
         <Route path="society-os" element={<SocietyOS />} />

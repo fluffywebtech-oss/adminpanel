@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Sparkles, Loader2, Wand2, ImageIcon, RefreshCw, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { normalizeAi, heuristicFromPrompt, pickImage, toDbRow } from '../lib/listingMapper'
+import { logAudit } from '../lib/audit'
 
 const EXAMPLES = [
   'DLF Privana North, 4 BHK penthouse, Sector 76 SPR Gurgaon, ultra-luxury ₹8.2 Cr, new launch',
@@ -47,6 +48,7 @@ export default function AiListing({ onClose, toast }) {
     const { error } = await supabase.from('properties').insert(toDbRow(draft, image)).select('id')
     setSaving(false)
     if (error) { toast?.('Save failed: ' + error.message, 'error'); return }
+    logAudit('Published listing', `${draft.title} (AI)`)
     setSaved(true); toast?.('Listing published to Supabase', 'success')
   }
 

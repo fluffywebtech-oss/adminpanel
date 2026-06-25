@@ -26,6 +26,7 @@ import {
   TrendingUp,
   Sparkles,
   CalendarClock,
+  ShieldCheck,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -65,6 +66,7 @@ const navSections = [
       { path: '/notifications', label: 'Notifications', icon: Bell },
       { path: '/reviews', label: 'Reviews', icon: Star },
       { path: '/quiz', label: 'Quiz', icon: HelpCircle },
+      { path: '/team', label: 'Team & Access', icon: ShieldCheck },
       { path: '/settings', label: 'Settings', icon: Settings },
     ],
   },
