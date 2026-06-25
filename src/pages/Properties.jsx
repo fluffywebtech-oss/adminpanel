@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Search, Plus, Edit2, Trash2, Eye, X, MapPin, Bed, Bath, Square, Home, AlertTriangle, Star, Flame, Shield, Calendar, Car, Compass, Camera, Trees, Sparkles, Image, Upload, Phone, Mail, Globe, Building2, Loader2 } from 'lucide-react'
 import { useData } from '../context/DataContext'
 import { uploadImage } from '../lib/uploadImage'
+import BulkImport from '../components/BulkImport'
 
 const ITEMS_PER_PAGE = 8
 
@@ -18,6 +19,7 @@ export default function Properties() {
   const [badgeFilter, setBadgeFilter] = useState('all')
   const [page, setPage] = useState(1)
   const [showModal, setShowModal] = useState(false)
+  const [showBulk, setShowBulk] = useState(false)
   const [showDelete, setShowDelete] = useState(null)
   const [showView, setShowView] = useState(null)
   const [editing, setEditing] = useState(null)
@@ -140,7 +142,10 @@ export default function Properties() {
           <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
           <p className="text-gray-500 mt-1">Manage {properties.length} property listings</p>
         </div>
-        <button onClick={openAdd} className="btn-primary flex items-center gap-2"><Plus className="w-4 h-4" />Add Property</button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowBulk(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"><Upload className="w-4 h-4" />Bulk Import</button>
+          <button onClick={openAdd} className="btn-primary flex items-center gap-2"><Plus className="w-4 h-4" />Add Property</button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -649,6 +654,8 @@ export default function Properties() {
           </div>
         </div>
       )}
+
+      {showBulk && <BulkImport onClose={() => setShowBulk(false)} />}
     </div>
   )
 }
