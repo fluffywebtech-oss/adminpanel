@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { generateListing } from './api/_listingAI.js'
 import { generateSocial } from './api/_socialAI.js'
+import { askAssistant } from './api/_assistantAI.js'
 
 // Dev-only middleware so the /api/* AI endpoints work under `vite` (no Vercel runtime).
 function devApiPlugin(apiKey) {
@@ -9,6 +10,7 @@ function devApiPlugin(apiKey) {
   const routes = [
     route('/api/generate-listing', 'listing', (body) => generateListing(body.prompt, apiKey)),
     route('/api/social-post', 'post', (body) => generateSocial(body.property, apiKey)),
+    route('/api/assistant', 'reply', (body) => askAssistant(body.messages, body.context, apiKey)),
   ]
   return {
     name: 'dev-api-ai',

@@ -24,6 +24,7 @@ import {
   Video,
   Handshake,
   TrendingUp,
+  Sparkles,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -33,6 +34,7 @@ const navSections = [
     label: 'Content',
     items: [
       { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/assistant', label: 'AI Assistant', icon: Sparkles },
       { path: '/enquiries', label: 'Enquiries', icon: Inbox },
       { path: '/properties', label: 'Properties', icon: Home },
       { path: '/reels', label: 'Property Reels', icon: Film },
