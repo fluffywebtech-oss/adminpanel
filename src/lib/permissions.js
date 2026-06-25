@@ -12,14 +12,33 @@ export const MODULES = [
   'Team & Audit',
 ]
 
-// level per role × module: full | edit | view | none
-export const MATRIX = {
+export const LEVELS = ['none', 'view', 'edit', 'full'] // ascending
+
+// Factory defaults — level per role × module: full | edit | view | none
+export const DEFAULT_MATRIX = {
   Properties:                     { Owner: 'full', Manager: 'edit', Agent: 'edit', Viewer: 'view' },
   'Enquiries & Meetings':         { Owner: 'full', Manager: 'edit', Agent: 'edit', Viewer: 'view' },
   'Content (Blog/Video/Podcast)': { Owner: 'full', Manager: 'edit', Agent: 'view', Viewer: 'view' },
   'Finance (Deals/Invest)':       { Owner: 'full', Manager: 'edit', Agent: 'none', Viewer: 'view' },
   'Site & Settings':              { Owner: 'full', Manager: 'view', Agent: 'none', Viewer: 'none' },
   'Team & Audit':                 { Owner: 'full', Manager: 'view', Agent: 'none', Viewer: 'none' },
+}
+
+// Owner-configurable matrix (localStorage override merged over defaults).
+// Owner is always pinned to full so an admin can never lock themselves out.
+export function getMatrix() {
+  let over = null
+  try { over = JSON.parse(localStorage.getItem('os_permissions') || 'null') } catch { /* ignore */ }
+  const m = {}
+  for (const mod of MODULES) m[mod] = { ...DEFAULT_MATRIX[mod], ...(over?.[mod] || {}), Owner: 'full' }
+  return m
+}
+export function setMatrix(matrix) {
+  try { localStorage.setItem('os_permissions', JSON.stringify(matrix)) } catch { /* ignore */ }
+  try { supabase.from('settings').upsert({ key: 'permissions', value: matrix }).then(() => {}, () => {}) } catch { /* no table */ }
+}
+export function resetMatrix() {
+  try { localStorage.removeItem('os_permissions') } catch { /* ignore */ }
 }
 
 // Default team (also the demo accounts). Password for all = 'demo123' (Owner also 'admin123').
@@ -45,7 +64,7 @@ const ROUTE_MODULE = {
 }
 
 export const moduleForRoute = (path) => ROUTE_MODULE[path] || 'always'
-export const levelFor = (role, module) => (module === 'always' ? 'full' : (MATRIX[module]?.[role] || 'none'))
+export const levelFor = (role, module) => (module === 'always' ? 'full' : (getMatrix()[module]?.[role] || 'none'))
 export const canView = (role, module) => levelFor(role, module) !== 'none'
 export const canEdit = (role, module) => ['edit', 'full'].includes(levelFor(role, module))
 

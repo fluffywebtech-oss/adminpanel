@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Users, ShieldCheck, ScrollText, Plus, Edit2, Trash2, Search, Mail, Circle } from 'lucide-react'
+import { Users, ShieldCheck, ScrollText, Plus, Edit2, Trash2, Search, Mail, Circle, Save, RotateCcw, Lock } from 'lucide-react'
 import { useSupabaseCollection } from '../hooks/useSupabaseCollection'
 import { Modal, Confirm } from './Transactions'
 import { getAudit, logAudit } from '../lib/audit'
+import { getMatrix, setMatrix, resetMatrix, LEVELS } from '../lib/permissions'
 
 const ROLES = ['Owner', 'Manager', 'Agent', 'Viewer']
 const ROLE_STYLE = {
@@ -45,6 +46,18 @@ export default function Team() {
   const [audit] = useState(() => getAudit())
   const [auditActor, setAuditActor] = useState('all')
   const [search, setSearch] = useState('')
+  const [matrix, setMatrixState] = useState(() => getMatrix())
+  const [permDirty, setPermDirty] = useState(false)
+
+  const cycle = (mod, role) => {
+    if (role === 'Owner') return // owner is always full
+    const cur = matrix[mod][role]
+    const next = LEVELS[(LEVELS.indexOf(cur) + 1) % LEVELS.length]
+    setMatrixState(m => ({ ...m, [mod]: { ...m[mod], [role]: next } }))
+    setPermDirty(true)
+  }
+  const savePerms = () => { setMatrix(matrix); setPermDirty(false); logAudit('Updated role permissions', 'access matrix') }
+  const resetPerms = () => { resetMatrix(); setMatrixState(getMatrix()); setPermDirty(false); logAudit('Reset role permissions', 'factory defaults') }
 
   const openAdd = () => { setEditing(null); setForm(EMPTY); setShowModal(true) }
   const openEdit = (m) => { setEditing(m.id); setForm({ ...EMPTY, ...m }); setShowModal(true) }
@@ -107,29 +120,46 @@ export default function Team() {
         </>
       )}
 
-      {/* ── Roles matrix ── */}
+      {/* ── Roles matrix (editable) ── */}
       {tab === 'roles' && (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
-                <th className="text-left px-4 py-3 font-bold">Module</th>
-                {ROLES.map(r => <th key={r} className="px-4 py-3 font-bold text-center">{r}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {MODULES.map(mod => (
-                <tr key={mod} className="border-t border-gray-100">
-                  <td className="px-4 py-3 font-medium text-gray-800">{mod}</td>
-                  {ROLES.map(r => {
-                    const lvl = LEVEL[MATRIX[mod][r]]
-                    return <td key={r} className="px-4 py-3 text-center"><span className={`text-xs font-bold px-2 py-0.5 rounded-full ${lvl.cls}`}>{lvl.label}</span></td>
-                  })}
+        <div>
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <p className="text-sm text-gray-500">Click any cell to change a role’s access. Changes apply to those users on their next visit.</p>
+            <div className="flex items-center gap-2">
+              <button onClick={resetPerms} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"><RotateCcw className="w-4 h-4" /> Reset</button>
+              <button onClick={savePerms} disabled={!permDirty} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-40"><Save className="w-4 h-4" /> {permDirty ? 'Save changes' : 'Saved'}</button>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                  <th className="text-left px-4 py-3 font-bold">Module</th>
+                  {ROLES.map(r => <th key={r} className="px-4 py-3 font-bold text-center">{r}{r === 'Owner' && <Lock className="w-3 h-3 inline ml-1 -mt-0.5 text-gray-400" />}</th>)}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="text-xs text-gray-400 px-4 py-3 border-t border-gray-100">Owner has full control. Manager edits operations but can't manage team/settings. Agent works listings & leads. Viewer is read-only.</p>
+              </thead>
+              <tbody>
+                {MODULES.map(mod => (
+                  <tr key={mod} className="border-t border-gray-100">
+                    <td className="px-4 py-3 font-medium text-gray-800">{mod}</td>
+                    {ROLES.map(r => {
+                      const lvl = LEVEL[matrix[mod][r]]
+                      const locked = r === 'Owner'
+                      return (
+                        <td key={r} className="px-4 py-2.5 text-center">
+                          <button onClick={() => cycle(mod, r)} disabled={locked}
+                            className={`text-xs font-bold px-2.5 py-1 rounded-full ${lvl.cls} ${locked ? 'cursor-default opacity-90' : 'hover:ring-2 hover:ring-primary-200 cursor-pointer'}`}>
+                            {lvl.label}
+                          </button>
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="text-xs text-gray-400 px-4 py-3 border-t border-gray-100">Levels cycle: — → View → Edit → Full. Owner is locked to Full so you can’t lock yourself out.</p>
+          </div>
         </div>
       )}
 
