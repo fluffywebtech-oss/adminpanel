@@ -5,10 +5,10 @@ import { Modal, Confirm } from './Transactions'
 import { getAudit, logAudit } from '../lib/audit'
 import { getMatrix, setMatrix, resetMatrix, LEVELS } from '../lib/permissions'
 
-const ROLES = ['Owner', 'Manager', 'Agent', 'Viewer']
+const ROLES = ['Owner', 'Manager', 'Agent', 'Builder', 'Viewer']
 const ROLE_STYLE = {
   Owner: 'bg-violet-50 text-violet-700', Manager: 'bg-blue-50 text-blue-700',
-  Agent: 'bg-teal-50 text-teal-700', Viewer: 'bg-gray-100 text-gray-500',
+  Agent: 'bg-teal-50 text-teal-700', Builder: 'bg-orange-50 text-orange-700', Viewer: 'bg-gray-100 text-gray-500',
 }
 const MODULES = ['Properties', 'Enquiries & Meetings', 'Content (Blog/Video/Podcast)', 'Finance (Deals/Invest)', 'Site & Settings', 'Team & Audit']
 // permission level per role × module: full | edit | view | none
@@ -31,6 +31,7 @@ const SEED_TEAM = [
   { id: 1, name: 'You (Owner)', email: 'admin@example.com', role: 'Owner', status: 'Active', last_active: 'Just now' },
   { id: 2, name: 'Priya Sharma', email: 'priya@propertyinsta.com', role: 'Manager', status: 'Active', last_active: '2h ago' },
   { id: 3, name: 'Rajiv Malhotra', email: 'rajiv@propertyinsta.com', role: 'Agent', status: 'Active', last_active: 'Yesterday' },
+  { id: 5, name: 'DLF Projects Desk', email: 'builder@dlf.com', role: 'Builder', status: 'Active', last_active: '1h ago' },
   { id: 4, name: 'External Auditor', email: 'audit@propertyinsta.com', role: 'Viewer', status: 'Invited', last_active: '—' },
 ]
 const EMPTY = { name: '', email: '', role: 'Agent', status: 'Invited', last_active: '—' }

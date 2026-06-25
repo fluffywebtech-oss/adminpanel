@@ -114,6 +114,7 @@ export default function Login() {
                 ['Owner', 'admin@example.com', 'admin123'],
                 ['Manager', 'priya@propertyinsta.com', 'demo123'],
                 ['Agent', 'rajiv@propertyinsta.com', 'demo123'],
+                ['Builder', 'builder@dlf.com', 'demo123'],
                 ['Viewer', 'audit@propertyinsta.com', 'demo123'],
               ].map(([label, em, pw]) => (
                 <button key={label} type="button" onClick={() => { setEmail(em); setPassword(pw); }}

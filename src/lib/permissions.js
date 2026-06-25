@@ -1,7 +1,7 @@
 // Central RBAC: roles, the module × role permission matrix, route→module map,
 // and helpers to resolve a user's role + what they can see/do.
 
-export const ROLES = ['Owner', 'Manager', 'Agent', 'Viewer']
+export const ROLES = ['Owner', 'Manager', 'Agent', 'Builder', 'Viewer']
 
 export const MODULES = [
   'Properties',
@@ -16,12 +16,12 @@ export const LEVELS = ['none', 'view', 'edit', 'full'] // ascending
 
 // Factory defaults — level per role × module: full | edit | view | none
 export const DEFAULT_MATRIX = {
-  Properties:                     { Owner: 'full', Manager: 'edit', Agent: 'edit', Viewer: 'view' },
-  'Enquiries & Meetings':         { Owner: 'full', Manager: 'edit', Agent: 'edit', Viewer: 'view' },
-  'Content (Blog/Video/Podcast)': { Owner: 'full', Manager: 'edit', Agent: 'view', Viewer: 'view' },
-  'Finance (Deals/Invest)':       { Owner: 'full', Manager: 'edit', Agent: 'none', Viewer: 'view' },
-  'Site & Settings':              { Owner: 'full', Manager: 'view', Agent: 'none', Viewer: 'none' },
-  'Team & Audit':                 { Owner: 'full', Manager: 'view', Agent: 'none', Viewer: 'none' },
+  Properties:                     { Owner: 'full', Manager: 'edit', Agent: 'edit', Builder: 'edit', Viewer: 'view' },
+  'Enquiries & Meetings':         { Owner: 'full', Manager: 'edit', Agent: 'edit', Builder: 'view', Viewer: 'view' },
+  'Content (Blog/Video/Podcast)': { Owner: 'full', Manager: 'edit', Agent: 'view', Builder: 'view', Viewer: 'view' },
+  'Finance (Deals/Invest)':       { Owner: 'full', Manager: 'edit', Agent: 'none', Builder: 'none', Viewer: 'view' },
+  'Site & Settings':              { Owner: 'full', Manager: 'view', Agent: 'none', Builder: 'none', Viewer: 'none' },
+  'Team & Audit':                 { Owner: 'full', Manager: 'view', Agent: 'none', Builder: 'none', Viewer: 'none' },
 }
 
 // Owner-configurable matrix (localStorage override merged over defaults).
@@ -46,6 +46,7 @@ export const DEFAULT_TEAM = [
   { id: 1, name: 'You (Owner)', email: 'admin@example.com', role: 'Owner', status: 'Active', last_active: 'Just now' },
   { id: 2, name: 'Priya Sharma', email: 'priya@propertyinsta.com', role: 'Manager', status: 'Active', last_active: '2h ago' },
   { id: 3, name: 'Rajiv Malhotra', email: 'rajiv@propertyinsta.com', role: 'Agent', status: 'Active', last_active: 'Yesterday' },
+  { id: 5, name: 'DLF Projects Desk', email: 'builder@dlf.com', role: 'Builder', status: 'Active', last_active: '1h ago' },
   { id: 4, name: 'External Auditor', email: 'audit@propertyinsta.com', role: 'Viewer', status: 'Invited', last_active: '—' },
 ]
 
