@@ -311,8 +311,8 @@ export function DataProvider({ children }) {
       lng: property.lng,
       neighborhood: property.neighborhood,
       floor_plan: property.floorPlan,
-      developer_logo: property.developerLogo || '',
-      developer_website: property.developerWebsite || '',
+      // NOTE: developer_logo/developer_website columns don't exist on the
+      // properties table — including them makes the insert fail with PGRST204.
     };
 
     // Try Supabase JS client first
@@ -378,7 +378,7 @@ export function DataProvider({ children }) {
           reraId: 'rera_id', possessionStatus: 'possession_status', pricePerSqft: 'price_per_sqft',
           floorPlan: 'floor_plan', openHouse: 'open_house', bankOffers: 'bank_offers',
           emiEstimate: 'emi_estimate', postDate: 'post_date',
-          developerLogo: 'developer_logo', developerWebsite: 'developer_website',
+          // developerLogo/developerWebsite intentionally excluded — no such columns
         };
         for (const [key, value] of Object.entries(updates)) {
           // Handle nested agent object — extract phone/email into flat DB columns
