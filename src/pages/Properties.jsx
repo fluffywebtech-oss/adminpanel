@@ -3,6 +3,7 @@ import { Search, Plus, Edit2, Trash2, Eye, X, MapPin, Bed, Bath, Square, Home, A
 import { useData } from '../context/DataContext'
 import { uploadImage } from '../lib/uploadImage'
 import BulkImport from '../components/BulkImport'
+import AiListing from '../components/AiListing'
 
 const ITEMS_PER_PAGE = 8
 
@@ -20,6 +21,7 @@ export default function Properties() {
   const [page, setPage] = useState(1)
   const [showModal, setShowModal] = useState(false)
   const [showBulk, setShowBulk] = useState(false)
+  const [showAi, setShowAi] = useState(false)
   const [showDelete, setShowDelete] = useState(null)
   const [showView, setShowView] = useState(null)
   const [editing, setEditing] = useState(null)
@@ -143,6 +145,7 @@ export default function Properties() {
           <p className="text-gray-500 mt-1">Manage {properties.length} property listings</p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={() => setShowAi(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:opacity-90"><Sparkles className="w-4 h-4" />AI Generate</button>
           <button onClick={() => setShowBulk(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"><Upload className="w-4 h-4" />Bulk Import</button>
           <button onClick={openAdd} className="btn-primary flex items-center gap-2"><Plus className="w-4 h-4" />Add Property</button>
         </div>
@@ -656,6 +659,7 @@ export default function Properties() {
       )}
 
       {showBulk && <BulkImport onClose={() => setShowBulk(false)} />}
+      {showAi && <AiListing onClose={() => setShowAi(false)} />}
     </div>
   )
 }
