@@ -6,6 +6,7 @@ import BulkImport from '../components/BulkImport'
 import AiListing from '../components/AiListing'
 import SocialStudio from '../components/SocialStudio'
 import { Megaphone } from 'lucide-react'
+import { usePermissions } from '../hooks/usePermissions'
 
 const ITEMS_PER_PAGE = 8
 
@@ -15,6 +16,8 @@ function Badge({ children, className }) {
 
 export default function Properties() {
   const { properties, addProperty, updateProperty, deleteProperty, formatPriceIndian } = useData()
+  const { canEditModule } = usePermissions()
+  const canEdit = canEditModule('Properties')
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -147,11 +150,15 @@ export default function Properties() {
           <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
           <p className="text-gray-500 mt-1">Manage {properties.length} property listings</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowAi(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:opacity-90"><Sparkles className="w-4 h-4" />AI Generate</button>
-          <button onClick={() => setShowBulk(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"><Upload className="w-4 h-4" />Bulk Import</button>
-          <button onClick={openAdd} className="btn-primary flex items-center gap-2"><Plus className="w-4 h-4" />Add Property</button>
-        </div>
+        {canEdit ? (
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowAi(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:opacity-90"><Sparkles className="w-4 h-4" />AI Generate</button>
+            <button onClick={() => setShowBulk(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"><Upload className="w-4 h-4" />Bulk Import</button>
+            <button onClick={openAdd} className="btn-primary flex items-center gap-2"><Plus className="w-4 h-4" />Add Property</button>
+          </div>
+        ) : (
+          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">🔒 Read-only</span>
+        )}
       </div>
 
       {/* Filters */}
@@ -259,8 +266,8 @@ export default function Properties() {
                     <div className="flex items-center gap-1">
                       <button onClick={() => setShowView(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500" title="Preview"><Eye className="w-4 h-4" /></button>
                       <button onClick={() => setShowSocial(p)} className="p-1.5 rounded-md hover:bg-violet-50 text-violet-600" title="AI Social Post"><Megaphone className="w-4 h-4" /></button>
-                      <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-blue-500" title="Edit"><Edit2 className="w-4 h-4" /></button>
-                      <button onClick={() => setShowDelete(p.id)} className="p-1.5 rounded-md hover:bg-gray-100 text-red-500" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                      {canEdit && <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-blue-500" title="Edit"><Edit2 className="w-4 h-4" /></button>}
+                      {canEdit && <button onClick={() => setShowDelete(p.id)} className="p-1.5 rounded-md hover:bg-gray-100 text-red-500" title="Delete"><Trash2 className="w-4 h-4" /></button>}
                     </div>
                   </td>
                 </tr>

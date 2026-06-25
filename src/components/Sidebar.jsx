@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { usePermissions } from '../hooks/usePermissions'
 import {
   LayoutDashboard,
   Settings,
@@ -76,7 +77,13 @@ const navSections = [
 
 export default function Sidebar({ open = false, onClose = () => {} }) {
   const { logout, user } = useAuth()
+  const { role, canViewRoute } = usePermissions()
   const [collapsed, setCollapsed] = useState(false)
+
+  // Hide nav items the current role can't view; drop empty sections
+  const sections = navSections
+    .map((s) => ({ ...s, items: s.items.filter((i) => canViewRoute(i.path)) }))
+    .filter((s) => s.items.length)
 
   return (
     <aside
@@ -109,7 +116,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
 
       {/* Navigation */}
       <nav className="flex-1 py-4 px-2 overflow-y-auto space-y-1">
-        {navSections.map((section) => (
+        {sections.map((section) => (
           <div key={section.label}>
             {!collapsed && (
               <div className="px-3 pt-4 pb-1 text-xs font-bold text-gray-500 uppercase tracking-widest">
@@ -149,6 +156,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
               <p className="text-sm font-medium truncate">{user?.name || 'Admin'}</p>
               <p className="text-xs text-gray-400 truncate">{user?.email || 'admin@example.com'}</p>
             </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-500/20 text-primary-200 shrink-0">{role}</span>
           </div>
         )}
         <button
