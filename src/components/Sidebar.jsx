@@ -25,6 +25,7 @@ import {
   Handshake,
   TrendingUp,
   Sparkles,
+  CalendarClock,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -36,6 +37,7 @@ const navSections = [
       { path: '/', label: 'Dashboard', icon: LayoutDashboard },
       { path: '/assistant', label: 'AI Assistant', icon: Sparkles },
       { path: '/enquiries', label: 'Enquiries', icon: Inbox },
+      { path: '/meetings', label: 'Meetings', icon: CalendarClock },
       { path: '/properties', label: 'Properties', icon: Home },
       { path: '/reels', label: 'Property Reels', icon: Film },
       { path: '/stories', label: 'Stories', icon: PlayCircle },

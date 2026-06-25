@@ -19,6 +19,7 @@ import SocietyOS from './pages/SocietyOS'
 import PropertyManagement from './pages/PropertyManagement'
 import Enquiries from './pages/Enquiries'
 import Assistant from './pages/Assistant'
+import Meetings from './pages/Meetings'
 import Podcasts from './pages/Podcasts'
 import Videos from './pages/Videos'
 import Transactions from './pages/Transactions'
@@ -72,6 +73,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="assistant" element={<Assistant />} />
         <Route path="enquiries" element={<Enquiries />} />
+        <Route path="meetings" element={<Meetings />} />
         <Route path="properties" element={<Properties />} />
         <Route path="reels" element={<Reels />} />
         <Route path="stories" element={<Stories />} />
