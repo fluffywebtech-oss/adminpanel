@@ -27,6 +27,7 @@ import {
   Sparkles,
   CalendarClock,
   ShieldCheck,
+  FileDown,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -67,6 +68,7 @@ const navSections = [
       { path: '/reviews', label: 'Reviews', icon: Star },
       { path: '/quiz', label: 'Quiz', icon: HelpCircle },
       { path: '/team', label: 'Team & Access', icon: ShieldCheck },
+      { path: '/reports', label: 'Reports & Export', icon: FileDown },
       { path: '/settings', label: 'Settings', icon: Settings },
     ],
   },
