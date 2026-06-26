@@ -29,6 +29,7 @@ import {
   CalendarClock,
   ShieldCheck,
   FileDown,
+  Hammer,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -59,6 +60,12 @@ const navSections = [
       { path: '/channel-partners', label: 'Channel Partners', icon: Network },
       { path: '/society-os', label: 'Society OS', icon: Shield },
       { path: '/property-management', label: 'Property Mgmt', icon: Key },
+    ],
+  },
+  {
+    label: 'Build With Us',
+    items: [
+      { path: '/materials', label: 'Materials & Hardware', icon: Hammer },
     ],
   },
   {

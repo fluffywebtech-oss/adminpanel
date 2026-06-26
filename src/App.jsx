@@ -22,6 +22,7 @@ import Assistant from './pages/Assistant'
 import Meetings from './pages/Meetings'
 import Team from './pages/Team'
 import Reports from './pages/Reports'
+import Materials from './pages/Materials'
 import Podcasts from './pages/Podcasts'
 import Videos from './pages/Videos'
 import Transactions from './pages/Transactions'
@@ -90,6 +91,7 @@ export default function App() {
         <Route path="settings" element={<Settings />} />
         <Route path="team" element={<Team />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="materials" element={<Materials />} />
         <Route path="builder-erp" element={<BuilderERP />} />
         <Route path="channel-partners" element={<ChannelPartners />} />
         <Route path="society-os" element={<SocietyOS />} />

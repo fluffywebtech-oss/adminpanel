@@ -55,6 +55,7 @@ const ROUTE_MODULE = {
   '/enquiries': 'Enquiries & Meetings', '/meetings': 'Enquiries & Meetings',
   '/properties': 'Properties', '/property-management': 'Properties',
   '/builder-erp': 'Properties', '/channel-partners': 'Properties', '/society-os': 'Properties',
+  '/materials': 'Properties',
   '/reels': 'Content (Blog/Video/Podcast)', '/stories': 'Content (Blog/Video/Podcast)',
   '/blogs': 'Content (Blog/Video/Podcast)', '/podcasts': 'Content (Blog/Video/Podcast)',
   '/videos': 'Content (Blog/Video/Podcast)', '/agents': 'Content (Blog/Video/Podcast)',
