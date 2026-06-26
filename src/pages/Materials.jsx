@@ -8,10 +8,10 @@ const CATEGORIES = ['Cement', 'Steel & TMT', 'Bricks & Blocks', 'Tiles & Floorin
 const STOCK = ['In Stock', 'Low Stock', 'Out of Stock']
 const STOCK_STYLE = { 'In Stock': 'bg-green-50 text-green-700', 'Low Stock': 'bg-amber-50 text-amber-700', 'Out of Stock': 'bg-red-50 text-red-600' }
 const IMG = {
-  Cement: '1581094794329-c8112a89af12', 'Steel & TMT': '1565008576549-57569a49371d', 'Bricks & Blocks': '1599629954294-14df9ec8bc05',
-  'Tiles & Flooring': '1615873968403-89e068629265', Paints: '1589939705384-5185137a7f0f', Plumbing: '1607472586893-edb57bdc0e39',
-  Electrical: '1558002038-1055907df827', Sanitaryware: '1584622650111-993a426fbf0a', 'Hardware & Fittings': '1530124566582-a618bc2615dc',
-  'Wood & Ply': '1520208422220-d12a3c588e6c', 'Glass & Aluminium': '1503387762-592deb58ef4e',
+  Cement: '1575493438282-4e0fb32d1bdd', 'Steel & TMT': '1582540730843-f4418d96ccbe', 'Bricks & Blocks': '1531685250784-7569952593d2',
+  'Tiles & Flooring': '1678742755904-6c3fc8ba6602', Paints: '1623944361530-8a6cd3eb0de8', Plumbing: '1646009445351-b8192e095f3a',
+  Electrical: '1781243680870-6d33bf6874c1', Sanitaryware: '1587527901949-ab0341697c1e', 'Hardware & Fittings': '1583691028182-e8f01e74bfa2',
+  'Wood & Ply': '1611072337226-1140ab367200', 'Glass & Aluminium': '1523477593243-78bbf626fd3b',
 }
 const img = (cat) => `https://images.unsplash.com/photo-${IMG[cat] || IMG.Cement}?w=600&h=400&fit=crop`
 
