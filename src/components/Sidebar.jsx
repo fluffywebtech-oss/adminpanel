@@ -30,6 +30,9 @@ import {
   ShieldCheck,
   FileDown,
   Hammer,
+  HardHat,
+  Palette,
+  PencilRuler,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -66,6 +69,9 @@ const navSections = [
     label: 'Build With Us',
     items: [
       { path: '/materials', label: 'Materials & Hardware', icon: Hammer },
+      { path: '/contractors', label: 'Contractors & Services', icon: HardHat },
+      { path: '/designs', label: 'Design Ideas', icon: Palette },
+      { path: '/designers', label: 'Designers', icon: PencilRuler },
     ],
   },
   {

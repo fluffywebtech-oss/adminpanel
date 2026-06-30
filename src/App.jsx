@@ -23,6 +23,9 @@ import Meetings from './pages/Meetings'
 import Team from './pages/Team'
 import Reports from './pages/Reports'
 import Materials from './pages/Materials'
+import Contractors from './pages/Contractors'
+import Designs from './pages/Designs'
+import Designers from './pages/Designers'
 import Podcasts from './pages/Podcasts'
 import Videos from './pages/Videos'
 import Transactions from './pages/Transactions'
@@ -92,6 +95,9 @@ export default function App() {
         <Route path="team" element={<Team />} />
         <Route path="reports" element={<Reports />} />
         <Route path="materials" element={<Materials />} />
+        <Route path="contractors" element={<Contractors />} />
+        <Route path="designs" element={<Designs />} />
+        <Route path="designers" element={<Designers />} />
         <Route path="builder-erp" element={<BuilderERP />} />
         <Route path="channel-partners" element={<ChannelPartners />} />
         <Route path="society-os" element={<SocietyOS />} />
