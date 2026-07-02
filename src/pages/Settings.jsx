@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Save, User, Bell, Shield, Palette, Globe } from 'lucide-react'
 import { loadAppearance, saveAppearance, ACCENTS, ACCENT_KEYS } from '../lib/appearance'
@@ -36,6 +36,16 @@ export default function Settings() {
   // value (not React state) so rapid successive changes always compose.
   const [appr, setApprState] = useState(loadAppearance)
   const updateAppr = (patch) => { const next = { ...loadAppearance(), ...patch }; setApprState(next); saveAppearance(next) }
+
+  // Track the OS colour scheme so "System" can show what it resolves to
+  const [sysDark, setSysDark] = useState(() => window.matchMedia?.('(prefers-color-scheme: dark)').matches || false)
+  useEffect(() => {
+    const mq = window.matchMedia?.('(prefers-color-scheme: dark)')
+    if (!mq) return
+    const on = (e) => setSysDark(e.matches)
+    mq.addEventListener ? mq.addEventListener('change', on) : mq.addListener(on)
+    return () => { mq.removeEventListener ? mq.removeEventListener('change', on) : mq.removeListener(on) }
+  }, [])
 
   const handleSave = () => {
     setSaved(true)
@@ -354,9 +364,15 @@ export default function Settings() {
                     >
                       <div className={`w-full h-8 rounded mb-2 border ${t.sw}`}></div>
                       <span className={`text-sm font-medium ${t.text}`}>{t.label}</span>
+                      {t.key === 'system' && <span className="block text-[10px] text-gray-400 mt-0.5">Auto · {sysDark ? 'Dark' : 'Light'}</span>}
                     </button>
                   ))}
                 </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  {appr.theme === 'system'
+                    ? <>Following your device — currently <span className="font-semibold">{sysDark ? 'Dark' : 'Light'}</span>. Switches automatically when your device does.</>
+                    : <>Using <span className="font-semibold">{appr.theme === 'dark' ? 'Dark' : 'Light'}</span> mode.</>}
+                </p>
               </div>
 
               {/* Accent Color */}
