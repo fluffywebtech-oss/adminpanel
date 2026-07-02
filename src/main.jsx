@@ -3,7 +3,10 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import { DataProvider } from './context/DataContext'
+import { initAppearance } from './lib/appearance'
 import './index.css'
+
+initAppearance()
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>

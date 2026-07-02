@@ -50,3 +50,46 @@
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
   }
 }
+/* ══════════════════════════════════════════════════════════════════
+   Appearance — accent colour (CSS-var driven), dark theme & compact
+   ══════════════════════════════════════════════════════════════════ */
+:root { --accent-50: #eef4fd; --accent-500: #2e6fe0; --accent-600: #1f56c4; --accent-700: #1b4db1; }
+
+/* Recolour the primary utilities used across the app from the accent vars */
+.bg-primary-50 { background-color: var(--accent-50) !important; }
+.bg-primary-500 { background-color: var(--accent-500) !important; }
+.bg-primary-600 { background-color: var(--accent-600) !important; }
+.bg-primary-700 { background-color: var(--accent-700) !important; }
+.hover\:bg-primary-700:hover { background-color: var(--accent-700) !important; }
+.text-primary-500 { color: var(--accent-500) !important; }
+.text-primary-600 { color: var(--accent-600) !important; }
+.text-primary-700 { color: var(--accent-700) !important; }
+.border-primary-500 { border-color: var(--accent-500) !important; }
+.border-primary-600 { border-color: var(--accent-600) !important; }
+.ring-primary-500 { --tw-ring-color: var(--accent-500) !important; }
+.ring-primary-300 { --tw-ring-color: color-mix(in srgb, var(--accent-500) 45%, white) !important; }
+.focus\:ring-primary-500:focus { --tw-ring-color: var(--accent-500) !important; }
+.focus\:border-primary-500:focus { border-color: var(--accent-500) !important; }
+.btn-primary { background-image: linear-gradient(135deg, var(--accent-700) 0%, var(--accent-500) 100%) !important; }
+
+/* ── Dark theme (admin had no dark: styles, so override the common utilities) ── */
+.dark { color-scheme: dark; }
+.dark body { background-color: #0b1220 !important; color: #e5e7eb; }
+.dark .bg-white { background-color: #111a2e !important; }
+.dark .bg-gray-50 { background-color: #0b1220 !important; }
+.dark .bg-gray-100 { background-color: #1a2540 !important; }
+.dark .card { background-color: #111a2e !important; border-color: #1f2b45 !important; }
+.dark .text-gray-900 { color: #f3f4f6 !important; }
+.dark .text-gray-800 { color: #e5e7eb !important; }
+.dark .text-gray-700 { color: #d1d5db !important; }
+.dark .text-gray-600 { color: #aeb6c6 !important; }
+.dark .text-gray-500 { color: #8b93a5 !important; }
+.dark .text-gray-400 { color: #6b7488 !important; }
+.dark .border-gray-100, .dark .border-gray-200, .dark .border-gray-300 { border-color: #1f2b45 !important; }
+.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) { border-color: #1f2b45 !important; }
+.dark input, .dark select, .dark textarea, .dark .input-field {
+  background-color: #0f1830 !important; color: #e5e7eb !important; border-color: #26324f !important;
+}
+.dark .hover\:bg-gray-50:hover, .dark .hover\:bg-gray-100:hover { background-color: #1a2540 !important; }
+.dark .bg-primary-50 { background-color: color-mix(in srgb, var(--accent-500) 22%, #0b1220) !important; }
+.dark .shadow-lg, .dark .shadow-sm, .dark .shadow { box-shadow: 0 8px 28px rgba(0,0,0,0.45) !important; }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Save, User, Bell, Shield, Palette, Globe } from 'lucide-react'
+import { loadAppearance, saveAppearance, ACCENTS, ACCENT_KEYS } from '../lib/appearance'
 
 export default function Settings() {
   const { user } = useAuth()
@@ -30,6 +31,11 @@ export default function Settings() {
     sessionTimeout: '30',
     loginAttempts: '5',
   })
+
+  // Appearance — applied & persisted live. Merge onto the latest persisted
+  // value (not React state) so rapid successive changes always compose.
+  const [appr, setApprState] = useState(loadAppearance)
+  const updateAppr = (patch) => { const next = { ...loadAppearance(), ...patch }; setApprState(next); saveAppearance(next) }
 
   const handleSave = () => {
     setSaved(true)
@@ -332,52 +338,61 @@ export default function Settings() {
             <div className="card space-y-6">
               <h2 className="text-lg font-semibold text-gray-900">Appearance Settings</h2>
 
+              {/* Theme */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Theme</label>
                 <div className="grid grid-cols-3 gap-3">
-                  <button className="p-4 border-2 border-primary-500 rounded-lg bg-white text-center">
-                    <div className="w-full h-8 bg-gray-50 rounded mb-2 border border-gray-200"></div>
-                    <span className="text-sm font-medium text-gray-900">Light</span>
-                  </button>
-                  <button className="p-4 border-2 border-gray-200 rounded-lg bg-gray-900 text-center">
-                    <div className="w-full h-8 bg-gray-800 rounded mb-2 border border-gray-700"></div>
-                    <span className="text-sm font-medium text-gray-300">Dark</span>
-                  </button>
-                  <button className="p-4 border-2 border-gray-200 rounded-lg bg-gradient-to-b from-white to-gray-900 text-center">
-                    <div className="w-full h-8 bg-gradient-to-b from-gray-50 to-gray-800 rounded mb-2 border border-gray-400"></div>
-                    <span className="text-sm font-medium text-gray-600">System</span>
-                  </button>
+                  {[
+                    { key: 'light', label: 'Light', sw: 'bg-gray-50 border-gray-200', text: 'text-gray-900', card: 'bg-white' },
+                    { key: 'dark', label: 'Dark', sw: 'bg-gray-800 border-gray-700', text: 'text-gray-300', card: 'bg-gray-900' },
+                    { key: 'system', label: 'System', sw: 'bg-gradient-to-b from-gray-50 to-gray-800 border-gray-400', text: 'text-gray-600', card: 'bg-gradient-to-b from-white to-gray-900' },
+                  ].map((t) => (
+                    <button
+                      key={t.key}
+                      onClick={() => updateAppr({ theme: t.key })}
+                      className={`p-4 border-2 rounded-lg ${t.card} text-center transition-all ${appr.theme === t.key ? 'border-primary-500' : 'border-gray-200'}`}
+                    >
+                      <div className={`w-full h-8 rounded mb-2 border ${t.sw}`}></div>
+                      <span className={`text-sm font-medium ${t.text}`}>{t.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
+              {/* Accent Color */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Accent Color</label>
                 <div className="flex gap-3">
-                  {['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500', 'bg-red-500', 'bg-pink-500'].map((color) => (
+                  {ACCENT_KEYS.map((key) => (
                     <button
-                      key={color}
-                      className={`w-10 h-10 rounded-full ${color} ${color === 'bg-blue-500' ? 'ring-2 ring-offset-2 ring-blue-500' : ''}`}
+                      key={key}
+                      onClick={() => updateAppr({ accent: key })}
+                      aria-label={key}
+                      className="w-10 h-10 rounded-full transition-transform hover:scale-110"
+                      style={{ backgroundColor: ACCENTS[key][500], boxShadow: appr.accent === key ? `0 0 0 2px #fff, 0 0 0 4px ${ACCENTS[key][600]}` : 'none' }}
                     />
                   ))}
                 </div>
               </div>
 
+              {/* Font Size */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Font Size</label>
-                <select className="input-field">
-                  <option>Small (14px)</option>
-                  <option>Medium (16px)</option>
-                  <option>Large (18px)</option>
+                <select value={appr.fontSize} onChange={(e) => updateAppr({ fontSize: e.target.value })} className="input-field">
+                  <option value="14">Small (14px)</option>
+                  <option value="16">Medium (16px)</option>
+                  <option value="18">Large (18px)</option>
                 </select>
               </div>
 
+              {/* Compact Sidebar */}
               <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="font-medium text-gray-900">Compact Sidebar</p>
                   <p className="text-sm text-gray-500">Use a compact sidebar layout</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" className="sr-only peer" />
+                  <input type="checkbox" checked={appr.compact} onChange={(e) => updateAppr({ compact: e.target.checked })} className="sr-only peer" />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:border after:border-gray-300 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                 </label>
               </div>

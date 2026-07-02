@@ -2,12 +2,13 @@ import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Bell, Search, User, Moon, Sun, Menu } from 'lucide-react'
 import { notifications } from '../data/mockData'
+import { loadAppearance, saveAppearance } from '../lib/appearance'
 
 export default function Header({ onMenuClick = () => {} }) {
   const { user } = useAuth()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains('dark'))
   const [searchQuery, setSearchQuery] = useState('')
   const notifRef = useRef(null)
   const profileRef = useRef(null)
@@ -25,13 +26,12 @@ export default function Header({ onMenuClick = () => {} }) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Keep the icon in sync with the theme (Settings → Appearance or OS changes)
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [darkMode])
+    const sync = () => setDarkMode(document.documentElement.classList.contains('dark'))
+    window.addEventListener('appearancechange', sync)
+    return () => window.removeEventListener('appearancechange', sync)
+  }, [])
 
   const unreadCount = notifications.length
 
@@ -62,7 +62,7 @@ export default function Header({ onMenuClick = () => {} }) {
       <div className="flex items-center gap-1 sm:gap-3">
         {/* Dark Mode Toggle */}
         <button
-          onClick={() => setDarkMode(!darkMode)}
+          onClick={() => { const next = !darkMode; setDarkMode(next); saveAppearance({ ...loadAppearance(), theme: next ? 'dark' : 'light' }) }}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
         >
           {darkMode ? <Sun className="w-5 h-5 text-gray-600" /> : <Moon className="w-5 h-5 text-gray-600" />}

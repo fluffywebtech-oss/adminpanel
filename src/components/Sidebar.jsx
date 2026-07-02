@@ -35,7 +35,8 @@ import {
   PencilRuler,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { loadAppearance, saveAppearance } from '../lib/appearance'
 
 const navSections = [
   {
@@ -91,7 +92,14 @@ const navSections = [
 export default function Sidebar({ open = false, onClose = () => {} }) {
   const { logout, user } = useAuth()
   const { role, canViewRoute } = usePermissions()
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => loadAppearance().compact)
+
+  // Keep compact/collapsed in sync with the Appearance setting (both directions)
+  useEffect(() => {
+    const sync = () => setCollapsed(loadAppearance().compact)
+    window.addEventListener('appearancechange', sync)
+    return () => window.removeEventListener('appearancechange', sync)
+  }, [])
 
   // Hide nav items the current role can't view; drop empty sections
   const sections = navSections
@@ -113,7 +121,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
         </div>
         {/* Collapse toggle — desktop only */}
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={() => { const next = !collapsed; setCollapsed(next); saveAppearance({ ...loadAppearance(), compact: next }) }}
           className="hidden lg:block p-1 rounded-md hover:bg-sidebar-hover transition-colors"
         >
           {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
