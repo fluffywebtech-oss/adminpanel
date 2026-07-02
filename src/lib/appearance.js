@@ -1,5 +1,6 @@
 // Central appearance manager — theme, accent colour, font size & compact sidebar.
 // Persists to localStorage and applies to <html> so it works app-wide.
+// Themes: light · dark · warm (low-blue-light "eye care" tone).
 const KEY = 'admin_appearance'
 
 export const ACCENTS = {
@@ -12,21 +13,20 @@ export const ACCENTS = {
 }
 export const ACCENT_KEYS = Object.keys(ACCENTS)
 
-export const DEFAULTS = { theme: 'system', accent: 'blue', fontSize: '16', compact: false }
+export const DEFAULTS = { theme: 'light', accent: 'blue', fontSize: '16', compact: false }
 
 export function loadAppearance() {
-  try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(KEY) || '{}')) } }
-  catch { return { ...DEFAULTS } }
-}
-
-function prefersDark() {
-  return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  try {
+    const s = { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(KEY) || '{}')) }
+    if (!['light', 'dark', 'warm'].includes(s.theme)) s.theme = 'light' // migrate legacy 'system'
+    return s
+  } catch { return { ...DEFAULTS } }
 }
 
 export function applyAppearance(s) {
   const root = document.documentElement
-  const dark = s.theme === 'dark' || (s.theme === 'system' && prefersDark())
-  root.classList.toggle('dark', !!dark)
+  root.classList.toggle('dark', s.theme === 'dark')
+  root.classList.toggle('warm', s.theme === 'warm')
   root.classList.toggle('admin-compact', !!s.compact)
   root.style.fontSize = `${s.fontSize || 16}px`
   const a = ACCENTS[s.accent] || ACCENTS.blue
@@ -42,12 +42,7 @@ export function saveAppearance(s) {
   window.dispatchEvent(new CustomEvent('appearancechange', { detail: s }))
 }
 
-// Apply saved prefs on boot + react to OS theme changes when on "system".
+// Apply saved prefs on boot.
 export function initAppearance() {
   applyAppearance(loadAppearance())
-  if (typeof window !== 'undefined' && window.matchMedia) {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
-    const onChange = () => { const s = loadAppearance(); if (s.theme === 'system') applyAppearance(s) }
-    mq.addEventListener ? mq.addEventListener('change', onChange) : mq.addListener(onChange)
-  }
 }

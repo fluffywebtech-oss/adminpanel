@@ -93,3 +93,27 @@
 .dark .hover\:bg-gray-50:hover, .dark .hover\:bg-gray-100:hover { background-color: #1a2540 !important; }
 .dark .bg-primary-50 { background-color: color-mix(in srgb, var(--accent-500) 22%, #0b1220) !important; }
 .dark .shadow-lg, .dark .shadow-sm, .dark .shadow { box-shadow: 0 8px 28px rgba(0,0,0,0.45) !important; }
+
+/* ── Warm "Eye Care" theme — low blue light, sepia-tinted palette ── */
+.warm body { background-color: #f3ebd9 !important; color: #4a4034; }
+.warm .bg-white { background-color: #fbf5e9 !important; }
+.warm .bg-gray-50 { background-color: #f0e7d3 !important; }
+.warm .bg-gray-100 { background-color: #e9dcc1 !important; }
+.warm .card { background-color: #fbf5e9 !important; border-color: #e7dabf !important; }
+.warm .text-gray-900 { color: #43392c !important; }
+.warm .text-gray-800 { color: #4a4034 !important; }
+.warm .text-gray-700 { color: #5a4f3e !important; }
+.warm .text-gray-600 { color: #6f6350 !important; }
+.warm .text-gray-500 { color: #8a7b62 !important; }
+.warm .text-gray-400 { color: #a1927a !important; }
+.warm .border-gray-100, .warm .border-gray-200, .warm .border-gray-300 { border-color: #e6d8bd !important; }
+.warm input, .warm select, .warm textarea, .warm .input-field {
+  background-color: #fbf5e9 !important; color: #43392c !important; border-color: #ddccab !important;
+}
+.warm .hover\:bg-gray-50:hover, .warm .hover\:bg-gray-100:hover { background-color: #eee2ca !important; }
+.warm .shadow-lg, .warm .shadow-sm, .warm .shadow { box-shadow: 0 6px 20px rgba(120, 92, 40, 0.12) !important; }
+/* Gentle warm veil over everything (incl. images) to cut blue light */
+.warm body::after {
+  content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background: rgba(255, 168, 66, 0.07); mix-blend-mode: multiply;
+}
