@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { usePermissions } from '../hooks/usePermissions'
 import {
   LayoutDashboard,
   Settings,
@@ -15,61 +16,153 @@ import {
   Bell,
   Star,
   HelpCircle,
+  Building2,
+  Network,
+  Shield,
+  Key,
+  Inbox,
+  Mic,
+  Video,
+  Handshake,
+  TrendingUp,
+  Sparkles,
+  CalendarClock,
+  ShieldCheck,
+  FileDown,
+  Hammer,
+  HardHat,
+  Palette,
+  PencilRuler,
+  X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { loadAppearance, saveAppearance } from '../lib/appearance'
 
-const navItems = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/properties', label: 'Properties', icon: Home },
-  { path: '/reels', label: 'Property Reels', icon: Film },
-  { path: '/stories', label: 'Stories', icon: PlayCircle },
-  { path: '/blogs', label: 'Blog Posts', icon: FileText },
-  { path: '/agents', label: 'Agents', icon: Users },
-  { path: '/site-config', label: 'Site Config', icon: Globe },
-  { path: '/notifications', label: 'Notifications', icon: Bell },
-  { path: '/reviews', label: 'Reviews', icon: Star },
-  { path: '/quiz', label: 'Quiz', icon: HelpCircle },
-  { path: '/settings', label: 'Settings', icon: Settings },
+const navSections = [
+  {
+    label: 'Content',
+    items: [
+      { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/assistant', label: 'AI Assistant', icon: Sparkles },
+      { path: '/enquiries', label: 'Enquiries', icon: Inbox },
+      { path: '/meetings', label: 'Meetings', icon: CalendarClock },
+      { path: '/properties', label: 'Properties', icon: Home },
+      { path: '/reels', label: 'Property Reels', icon: Film },
+      { path: '/stories', label: 'Stories', icon: PlayCircle },
+      { path: '/blogs', label: 'Blog Posts', icon: FileText },
+      { path: '/podcasts', label: 'Podcasts', icon: Mic },
+      { path: '/videos', label: 'Product Videos', icon: Video },
+      { path: '/agents', label: 'Agents', icon: Users },
+    ],
+  },
+  {
+    label: 'Operations & Management',
+    items: [
+      { path: '/transactions', label: 'Transactions', icon: Handshake },
+      { path: '/investments', label: 'Investments', icon: TrendingUp },
+      { path: '/builder-erp', label: 'Builder ERP', icon: Building2 },
+      { path: '/channel-partners', label: 'Channel Partners', icon: Network },
+      { path: '/society-os', label: 'Society OS', icon: Shield },
+      { path: '/property-management', label: 'Property Mgmt', icon: Key },
+    ],
+  },
+  {
+    label: 'Build With Us',
+    items: [
+      { path: '/materials', label: 'Materials & Hardware', icon: Hammer },
+      { path: '/contractors', label: 'Contractors & Services', icon: HardHat },
+      { path: '/designs', label: 'Design Ideas', icon: Palette },
+      { path: '/designers', label: 'Designers', icon: PencilRuler },
+    ],
+  },
+  {
+    label: 'Platform',
+    items: [
+      { path: '/site-config', label: 'Site Config', icon: Globe },
+      { path: '/notifications', label: 'Notifications', icon: Bell },
+      { path: '/reviews', label: 'Reviews', icon: Star },
+      { path: '/quiz', label: 'Quiz', icon: HelpCircle },
+      { path: '/team', label: 'Team & Access', icon: ShieldCheck },
+      { path: '/reports', label: 'Reports & Export', icon: FileDown },
+      { path: '/settings', label: 'Settings', icon: Settings },
+    ],
+  },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose = () => {} }) {
   const { logout, user } = useAuth()
-  const [collapsed, setCollapsed] = useState(false)
+  const { role, canViewRoute } = usePermissions()
+  const [collapsed, setCollapsed] = useState(() => loadAppearance().compact)
+
+  // Keep compact/collapsed in sync with the Appearance setting (both directions)
+  useEffect(() => {
+    const sync = () => setCollapsed(loadAppearance().compact)
+    window.addEventListener('appearancechange', sync)
+    return () => window.removeEventListener('appearancechange', sync)
+  }, [])
+
+  // Hide nav items the current role can't view; drop empty sections
+  const sections = navSections
+    .map((s) => ({ ...s, items: s.items.filter((i) => canViewRoute(i.path)) }))
+    .filter((s) => s.items.length)
 
   return (
-    <aside className={`${collapsed ? 'w-16' : 'w-64'} bg-sidebar text-white flex flex-col transition-all duration-300 ease-in-out h-screen sticky top-0`}>
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 w-64 bg-sidebar text-white flex flex-col h-screen
+        transform transition-transform duration-300 ease-in-out
+        ${open ? 'translate-x-0' : '-translate-x-full'}
+        lg:static lg:translate-x-0 ${collapsed ? 'lg:w-16' : 'lg:w-64'}`}
+    >
       {/* Logo */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-gray-700">
-        <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
+        <div className={`flex items-center gap-3 ${collapsed ? 'lg:justify-center' : ''}`}>
           <Home className="w-8 h-8 text-primary-400" />
           {!collapsed && <span className="text-lg font-bold tracking-wide">PropertyInsta</span>}
         </div>
+        {/* Collapse toggle — desktop only */}
         <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1 rounded-md hover:bg-sidebar-hover transition-colors"
+          onClick={() => { const next = !collapsed; setCollapsed(next); saveAppearance({ ...loadAppearance(), compact: next }) }}
+          className="hidden lg:block p-1 rounded-md hover:bg-sidebar-hover transition-colors"
         >
           {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+        </button>
+        {/* Close — mobile only */}
+        <button
+          onClick={onClose}
+          className="lg:hidden p-1 rounded-md hover:bg-sidebar-hover transition-colors"
+        >
+          <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-4 space-y-1 px-2">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            end={item.path === '/'}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 ${
-                isActive
-                  ? 'bg-primary-600 text-white'
-                  : 'text-gray-300 hover:bg-sidebar-hover hover:text-white'
-              } ${collapsed ? 'justify-center' : ''}`
-            }
-          >
-            <item.icon className="w-5 h-5" />
-            {!collapsed && <span className="font-medium">{item.label}</span>}
-          </NavLink>
+      <nav className="flex-1 py-4 px-2 overflow-y-auto space-y-1">
+        {sections.map((section) => (
+          <div key={section.label}>
+            {!collapsed && (
+              <div className="px-3 pt-4 pb-1 text-xs font-bold text-gray-500 uppercase tracking-widest">
+                {section.label}
+              </div>
+            )}
+            {section.items.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                end={item.path === '/'}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 ${
+                    isActive
+                      ? 'bg-primary-600 text-white'
+                      : 'text-gray-300 hover:bg-sidebar-hover hover:text-white'
+                  } ${collapsed ? 'lg:justify-center' : ''}`
+                }
+              >
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                {!collapsed && <span className="font-medium">{item.label}</span>}
+              </NavLink>
+            ))}
+          </div>
         ))}
       </nav>
 
@@ -84,6 +177,7 @@ export default function Sidebar() {
               <p className="text-sm font-medium truncate">{user?.name || 'Admin'}</p>
               <p className="text-xs text-gray-400 truncate">{user?.email || 'admin@example.com'}</p>
             </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-500/20 text-primary-200 shrink-0">{role}</span>
           </div>
         )}
         <button

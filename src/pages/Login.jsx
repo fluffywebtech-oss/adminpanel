@@ -107,13 +107,24 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-500">
-              Demo credentials: <span className="font-medium text-gray-700">admin@example.com / admin123</span>
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              For Supabase writes to work, create a real user in your Supabase Auth dashboard with the same credentials.
-            </p>
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <p className="text-xs font-semibold text-gray-500 text-center mb-2">Demo logins — see role-based access in action</p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                ['Owner', 'admin@example.com', 'admin123'],
+                ['Manager', 'priya@propertyinsta.com', 'demo123'],
+                ['Agent', 'rajiv@propertyinsta.com', 'demo123'],
+                ['Builder', 'builder@dlf.com', 'demo123'],
+                ['Viewer', 'audit@propertyinsta.com', 'demo123'],
+              ].map(([label, em, pw]) => (
+                <button key={label} type="button" onClick={() => { setEmail(em); setPassword(pw); }}
+                  className="text-left px-3 py-2 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors">
+                  <span className="block text-sm font-bold text-gray-800">{label}</span>
+                  <span className="block text-[11px] text-gray-400 truncate">{em}</span>
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-400 mt-2 text-center">Click a role to prefill, then Sign In. Each sees a different slice of the admin.</p>
           </div>
         </div>
       </div>

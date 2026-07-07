@@ -1,6 +1,12 @@
-import { useState, useRef } from 'react'
-import { Search, Plus, Edit2, Trash2, Eye, X, MapPin, Bed, Bath, Square, Home, AlertTriangle, Star, Flame, Shield, Calendar, Car, Compass, Camera, Trees, Sparkles, Image, Upload, Phone, Mail, Globe, Building2 } from 'lucide-react'
+import { useState } from 'react'
+import { Search, Plus, Edit2, Trash2, Eye, X, MapPin, Bed, Bath, Square, Home, AlertTriangle, Star, Flame, Shield, Calendar, Car, Compass, Camera, Trees, Sparkles, Image, Upload, Phone, Mail, Globe, Building2, Loader2 } from 'lucide-react'
 import { useData } from '../context/DataContext'
+import { uploadImage } from '../lib/uploadImage'
+import BulkImport from '../components/BulkImport'
+import AiListing from '../components/AiListing'
+import SocialStudio from '../components/SocialStudio'
+import { Megaphone } from 'lucide-react'
+import { usePermissions } from '../hooks/usePermissions'
 
 const ITEMS_PER_PAGE = 8
 
@@ -10,6 +16,8 @@ function Badge({ children, className }) {
 
 export default function Properties() {
   const { properties, addProperty, updateProperty, deleteProperty, formatPriceIndian } = useData()
+  const { canEditModule } = usePermissions()
+  const canEdit = canEditModule('Properties')
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -17,6 +25,9 @@ export default function Properties() {
   const [badgeFilter, setBadgeFilter] = useState('all')
   const [page, setPage] = useState(1)
   const [showModal, setShowModal] = useState(false)
+  const [showBulk, setShowBulk] = useState(false)
+  const [showAi, setShowAi] = useState(false)
+  const [showSocial, setShowSocial] = useState(null)
   const [showDelete, setShowDelete] = useState(null)
   const [showView, setShowView] = useState(null)
   const [editing, setEditing] = useState(null)
@@ -28,6 +39,7 @@ export default function Properties() {
     agentPhone:'', agentEmail:'', developerLogo:'', developerWebsite:'',
   })
   const [imageUrlInput, setImageUrlInput] = useState('')
+  const [uploading, setUploading] = useState(false)
 
   const filtered = properties.filter(p => {
     if (search && !p.title.toLowerCase().includes(search.toLowerCase()) && !p.location.toLowerCase().includes(search.toLowerCase()) && !p.builder.toLowerCase().includes(search.toLowerCase())) return false
@@ -138,7 +150,15 @@ export default function Properties() {
           <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
           <p className="text-gray-500 mt-1">Manage {properties.length} property listings</p>
         </div>
-        <button onClick={openAdd} className="btn-primary flex items-center gap-2"><Plus className="w-4 h-4" />Add Property</button>
+        {canEdit ? (
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowAi(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:opacity-90"><Sparkles className="w-4 h-4" />AI Generate</button>
+            <button onClick={() => setShowBulk(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"><Upload className="w-4 h-4" />Bulk Import</button>
+            <button onClick={openAdd} className="btn-primary flex items-center gap-2"><Plus className="w-4 h-4" />Add Property</button>
+          </div>
+        ) : (
+          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">🔒 Read-only</span>
+        )}
       </div>
 
       {/* Filters */}
@@ -162,6 +182,7 @@ export default function Properties() {
             <option value="all">All Status</option>
             <option value="sale">For Sale</option>
             <option value="rent">For Rent</option>
+            <option value="lease">For Lease</option>
           </select>
           <select value={possessionFilter} onChange={e => { setPossessionFilter(e.target.value); setPage(1) }} className="input-field w-auto">
             <option value="all">All Possession</option>
@@ -243,9 +264,10 @@ export default function Properties() {
                   <td className="table-cell text-sm text-gray-500">{(p.views/1000).toFixed(1)}K</td>
                   <td className="table-cell">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setShowView(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500"><Eye className="w-4 h-4" /></button>
-                      <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-blue-500"><Edit2 className="w-4 h-4" /></button>
-                      <button onClick={() => setShowDelete(p.id)} className="p-1.5 rounded-md hover:bg-gray-100 text-red-500"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => setShowView(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500" title="Preview"><Eye className="w-4 h-4" /></button>
+                      <button onClick={() => setShowSocial(p)} className="p-1.5 rounded-md hover:bg-violet-50 text-violet-600" title="AI Social Post"><Megaphone className="w-4 h-4" /></button>
+                      {canEdit && <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-gray-100 text-blue-500" title="Edit"><Edit2 className="w-4 h-4" /></button>}
+                      {canEdit && <button onClick={() => setShowDelete(p.id)} className="p-1.5 rounded-md hover:bg-gray-100 text-red-500" title="Delete"><Trash2 className="w-4 h-4" /></button>}
                     </div>
                   </td>
                 </tr>
@@ -325,6 +347,7 @@ export default function Properties() {
                     <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="input-field">
                       <option value="sale">For Sale</option>
                       <option value="rent">For Rent</option>
+                      <option value="lease">For Lease</option>
                     </select>
                   </div>
                   <div>
@@ -370,23 +393,28 @@ export default function Properties() {
                     placeholder="Paste image URL..."
                   />
                   <button onClick={addImageUrl} className="btn-primary flex items-center gap-1"><Plus className="w-4 h-4" />Add URL</button>
-                  <label className="btn-secondary flex items-center gap-1 cursor-pointer">
-                    <Upload className="w-4 h-4" />Upload from PC
+                  <label className={`btn-secondary flex items-center gap-1 ${uploading ? 'opacity-60 cursor-wait' : 'cursor-pointer'}`}>
+                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    {uploading ? 'Uploading…' : 'Upload from PC'}
                     <input
                       type="file"
                       accept="image/*"
                       multiple
+                      disabled={uploading}
                       className="hidden"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const files = Array.from(e.target.files || [])
-                        files.forEach(file => {
-                          const reader = new FileReader()
-                          reader.onload = () => {
-                            setForm(f => ({ ...f, images: [...f.images, reader.result] }))
-                          }
-                          reader.readAsDataURL(file)
-                        })
                         e.target.value = ''
+                        if (!files.length) return
+                        setUploading(true)
+                        try {
+                          for (const file of files) {
+                            const url = await uploadImage(file)
+                            setForm(f => ({ ...f, images: [...f.images, url] }))
+                          }
+                        } finally {
+                          setUploading(false)
+                        }
                       }}
                     />
                   </label>
@@ -404,6 +432,7 @@ export default function Properties() {
                 ) : (
                   <p className="text-sm text-gray-400 py-3 border-2 border-dashed border-gray-200 rounded-lg text-center">No images added. Paste URLs or upload from your computer.</p>
                 )}
+                <p className="text-xs text-gray-400 mt-2">📦 Uploads are stored in your Supabase Storage bucket <code>property-images</code> and saved as public URLs — they appear instantly across the app.</p>
               </div>
 
               {/* Enriched Fields */}
@@ -639,6 +668,10 @@ export default function Properties() {
           </div>
         </div>
       )}
+
+      {showBulk && <BulkImport onClose={() => setShowBulk(false)} />}
+      {showAi && <AiListing onClose={() => setShowAi(false)} />}
+      {showSocial && <SocialStudio property={showSocial} onClose={() => setShowSocial(null)} />}
     </div>
   )
 }

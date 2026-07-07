@@ -5,6 +5,8 @@ import {
   allReels as staticReels,
   propertyStories as staticStories,
   blogPosts as staticBlogs,
+  podcasts as staticPodcasts,
+  productVideos as staticVideos,
   agentsData as staticAgents,
   propertyReviews as staticReviews,
   quizQuestions as staticQuiz,
@@ -134,6 +136,8 @@ export function DataProvider({ children }) {
   const [reels, setReels] = useState(staticReels);
   const [stories, setStories] = useState(staticStories);
   const [blogs, setBlogs] = useState(staticBlogs);
+  const [podcasts, setPodcasts] = useState(staticPodcasts);
+  const [videos, setVideos] = useState(staticVideos);
   const [agents, setAgents] = useState(staticAgents);
   const [reviews, setReviews] = useState(() => {
     const initial = {};
@@ -307,8 +311,8 @@ export function DataProvider({ children }) {
       lng: property.lng,
       neighborhood: property.neighborhood,
       floor_plan: property.floorPlan,
-      developer_logo: property.developerLogo || '',
-      developer_website: property.developerWebsite || '',
+      // NOTE: developer_logo/developer_website columns don't exist on the
+      // properties table — including them makes the insert fail with PGRST204.
     };
 
     // Try Supabase JS client first
@@ -374,7 +378,7 @@ export function DataProvider({ children }) {
           reraId: 'rera_id', possessionStatus: 'possession_status', pricePerSqft: 'price_per_sqft',
           floorPlan: 'floor_plan', openHouse: 'open_house', bankOffers: 'bank_offers',
           emiEstimate: 'emi_estimate', postDate: 'post_date',
-          developerLogo: 'developer_logo', developerWebsite: 'developer_website',
+          // developerLogo/developerWebsite intentionally excluded — no such columns
         };
         for (const [key, value] of Object.entries(updates)) {
           // Handle nested agent object — extract phone/email into flat DB columns
@@ -594,6 +598,32 @@ export function DataProvider({ children }) {
     setBlogs(prev => prev.filter(b => b.id !== id));
   }, []);
 
+  const addPodcast = useCallback((podcast) => {
+    const newId = Math.max(...podcasts.map(p => p.id), 0) + 1;
+    setPodcasts(prev => [...prev, { id: newId, ...podcast }]);
+  }, [podcasts]);
+
+  const updatePodcast = useCallback((id, updates) => {
+    setPodcasts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+  }, []);
+
+  const deletePodcast = useCallback((id) => {
+    setPodcasts(prev => prev.filter(p => p.id !== id));
+  }, []);
+
+  const addVideo = useCallback((video) => {
+    const newId = Math.max(...videos.map(v => v.id), 0) + 1;
+    setVideos(prev => [...prev, { id: newId, ...video }]);
+  }, [videos]);
+
+  const updateVideo = useCallback((id, updates) => {
+    setVideos(prev => prev.map(v => v.id === id ? { ...v, ...updates } : v));
+  }, []);
+
+  const deleteVideo = useCallback((id) => {
+    setVideos(prev => prev.filter(v => v.id !== id));
+  }, []);
+
   // ==========================================================================
   // CRUD: Reviews (local only)
   // ==========================================================================
@@ -645,16 +675,11 @@ export function DataProvider({ children }) {
   }, []);
 
   // ==========================================================================
-  // Clear DB error
-  // ==========================================================================
-  const clearDbError = useCallback(() => setDbError(null), []);
-
-  // ==========================================================================
   // Exposed context value
   // ==========================================================================
   const value = {
     // Data
-    properties, reels, stories, blogs, agents, reviews, quiz,
+    properties, reels, stories, blogs, podcasts, videos, agents, reviews, quiz,
     // Dashboard
     dashboardStats, dashRevenueData: revenueData,
     dashPropertyTypeData: propertyTypeData,
@@ -663,7 +688,7 @@ export function DataProvider({ children }) {
     dashSiteConfig: staticSiteConfig,
     recentProperties,
     // Status
-    dbReady, dbError, clearDbError,
+    dbReady, dbError,
     // Property CRUD
     addProperty, updateProperty, deleteProperty,
     // Reel CRUD
@@ -674,6 +699,10 @@ export function DataProvider({ children }) {
     addStory, updateStory, deleteStory,
     // Blog CRUD
     addBlog, updateBlog, deleteBlog,
+    // Podcast CRUD
+    addPodcast, updatePodcast, deletePodcast,
+    // Video CRUD
+    addVideo, updateVideo, deleteVideo,
     // Review CRUD
     addReview, updateReview, deleteReview,
     // Quiz CRUD

@@ -13,6 +13,23 @@ import SiteConfig from './pages/SiteConfig'
 import Notifications from './pages/Notifications'
 import Reviews from './pages/Reviews'
 import Quiz from './pages/Quiz'
+import BuilderERP from './pages/BuilderERP'
+import ChannelPartners from './pages/ChannelPartners'
+import SocietyOS from './pages/SocietyOS'
+import PropertyManagement from './pages/PropertyManagement'
+import Enquiries from './pages/Enquiries'
+import Assistant from './pages/Assistant'
+import Meetings from './pages/Meetings'
+import Team from './pages/Team'
+import Reports from './pages/Reports'
+import Materials from './pages/Materials'
+import Contractors from './pages/Contractors'
+import Designs from './pages/Designs'
+import Designers from './pages/Designers'
+import Podcasts from './pages/Podcasts'
+import Videos from './pages/Videos'
+import Transactions from './pages/Transactions'
+import Investments from './pages/Investments'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -60,16 +77,33 @@ export default function App() {
         <ProtectedRoute><Layout /></ProtectedRoute>
       }>
         <Route index element={<Dashboard />} />
+        <Route path="assistant" element={<Assistant />} />
+        <Route path="enquiries" element={<Enquiries />} />
+        <Route path="meetings" element={<Meetings />} />
         <Route path="properties" element={<Properties />} />
         <Route path="reels" element={<Reels />} />
         <Route path="stories" element={<Stories />} />
         <Route path="blogs" element={<Blogs />} />
+        <Route path="podcasts" element={<Podcasts />} />
+        <Route path="videos" element={<Videos />} />
         <Route path="agents" element={<Agents />} />
         <Route path="site-config" element={<SiteConfig />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="reviews" element={<Reviews />} />
         <Route path="quiz" element={<Quiz />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="team" element={<Team />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="materials" element={<Materials />} />
+        <Route path="contractors" element={<Contractors />} />
+        <Route path="designs" element={<Designs />} />
+        <Route path="designers" element={<Designers />} />
+        <Route path="builder-erp" element={<BuilderERP />} />
+        <Route path="channel-partners" element={<ChannelPartners />} />
+        <Route path="society-os" element={<SocietyOS />} />
+        <Route path="property-management" element={<PropertyManagement />} />
+        <Route path="transactions" element={<Transactions />} />
+        <Route path="investments" element={<Investments />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

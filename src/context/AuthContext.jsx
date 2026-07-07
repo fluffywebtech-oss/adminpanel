@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { demoLogin, resolveRole } from '../lib/permissions'
 
 const AuthContext = createContext(null)
 
@@ -61,13 +62,15 @@ export function AuthProvider({ children }) {
             name: session.user.user_metadata?.name || session.user.email,
             email: session.user.email,
             role: 'admin',
+            accessRole: resolveRole(session.user.email),
             avatar: session.user.user_metadata?.avatar || null,
           }
           setUser(userData)
           localStorage.setItem('admin_user', JSON.stringify(userData))
         } else {
-          setUser(null)
-          localStorage.removeItem('admin_user')
+          // No Supabase session — keep any demo/team login already in localStorage
+          const stored = localStorage.getItem('admin_user')
+          setUser(stored ? JSON.parse(stored) : null)
         }
       })
 
@@ -87,19 +90,13 @@ export function AuthProvider({ children }) {
         })
 
         if (error) {
-          // If Supabase auth fails, fall back to mock login
-          console.warn('Supabase auth failed, trying mock login:', error.message)
-          if (email === 'admin@example.com' && password === 'admin123') {
-            const userData = {
-              id: 1,
-              name: 'Admin User',
-              email: 'admin@example.com',
-              role: 'admin',
-              avatar: null,
-            }
-            setUser(userData)
-            localStorage.setItem('admin_user', JSON.stringify(userData))
-            return { success: true, warning: 'Logged in with demo credentials. Real Supabase writes will use RLS bypass.' }
+          // If Supabase auth fails, fall back to demo/team login
+          console.warn('Supabase auth failed, trying demo login:', error.message)
+          const demo = demoLogin(email, password)
+          if (demo) {
+            setUser(demo)
+            localStorage.setItem('admin_user', JSON.stringify(demo))
+            return { success: true, warning: `Signed in as ${demo.accessRole}.` }
           }
           return { success: false, error: error.message }
         }
@@ -110,6 +107,7 @@ export function AuthProvider({ children }) {
           name: data.user.user_metadata?.name || data.user.email,
           email: data.user.email,
           role: 'admin',
+          accessRole: resolveRole(data.user.email),
           avatar: data.user.user_metadata?.avatar || null,
         }
         setUser(userData)
@@ -120,18 +118,12 @@ export function AuthProvider({ children }) {
       }
     }
 
-    // Mock fallback (no Supabase OR Supabase failed with catch)
-    if (email === 'admin@example.com' && password === 'admin123') {
-      const userData = {
-        id: 1,
-        name: 'Admin User',
-        email: 'admin@example.com',
-        role: 'admin',
-        avatar: null,
-      }
-      setUser(userData)
-      localStorage.setItem('admin_user', JSON.stringify(userData))
-      return { success: true, warning: 'Logged in with demo credentials. Supabase writes may not work. Create a user in Supabase Auth dashboard.' }
+    // Demo / team fallback (no Supabase OR Supabase failed with catch)
+    const demo = demoLogin(email, password)
+    if (demo) {
+      setUser(demo)
+      localStorage.setItem('admin_user', JSON.stringify(demo))
+      return { success: true, warning: `Signed in as ${demo.accessRole}.` }
     }
     return { success: false, error: 'Invalid email or password' }
   }
